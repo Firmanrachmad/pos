@@ -24,6 +24,10 @@
       <link rel="stylesheet" href="{{ asset('admins/plugins/daterangepicker/daterangepicker.css') }}">
       <!-- summernote -->
       <link rel="stylesheet" href="{{ asset('admins/plugins/summernote/summernote-bs4.min.css') }}">
+      <!-- DataTables -->
+      <link rel="stylesheet" href="{{ asset('admins/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+      <link rel="stylesheet" href="{{ asset('admins/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+      <link rel="stylesheet" href="{{ asset('admins/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
    </head>
    <body class="hold-transition sidebar-mini layout-fixed">
       <div class="wrapper">
@@ -130,7 +134,7 @@
                   </a>
                </li>
                <li class="nav-item">
-                  <a href="pages/widgets.html" class="nav-link">
+                  <a href="/orders" class="nav-link">
                      <i class="nav-icon fas fa-list"></i>
                      <p>
                         Orders
@@ -146,7 +150,7 @@
                   </a>
                </li>
                <li class="nav-item">
-                  <a href="pages/widgets.html" class="nav-link">
+                  <a href="/customers" class="nav-link">
                      <i class="nav-icon fas fa-user"></i>
                      <p>
                         Customer
@@ -166,8 +170,11 @@
             </div>
             <!-- /.sidebar -->
          </aside>
+
+         <!-- /.content -->
          @yield('content')
          <!-- /.content-wrapper -->
+         
          <footer class="main-footer">
             <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong>
             All rights reserved.
@@ -216,5 +223,35 @@
       <script src="{{ asset('admins/dist/js/demo.js') }}"></script>
       <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
       <script src="{{ asset('admins/dist/js/pages/dashboard.js') }}"></script>
+      <!-- DataTables  & Plugins -->
+      <script src="{{ asset('admins/plugins/datatables/jquery.dataTables.min.js') }}"></script>
+      <script src="{{ asset('admins/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+      <script src="{{ asset('admins/plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
+      <script src="{{ asset('admins/plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
+      <script src="{{ asset('admins/plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
+      <script src="{{ asset('admins/plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
+      <script src="{{ asset('admins/plugins/jszip/jszip.min.js') }}"></script>
+      <script src="{{ asset('admins/plugins/pdfmake/pdfmake.min.js') }}"></script>
+      <script src="{{ asset('admins/plugins/pdfmake/vfs_fonts.js') }}"></script>
+      <script src="{{ asset('admins/plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
+      <script src="{{ asset('admins/plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
+      <script src="{{ asset('admins/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
+      <script>
+         $(function () {
+            $("#example1").DataTable({
+               "responsive": true, "lengthChange": false, "autoWidth": false,
+               "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+            $('#example2').DataTable({
+               "paging": true,
+               "lengthChange": false,
+               "searching": false,
+               "ordering": true,
+               "info": true,
+               "autoWidth": false,
+               "responsive": true,
+            });
+         });
+      </script>
    </body>
 </html>
