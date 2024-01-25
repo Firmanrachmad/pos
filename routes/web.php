@@ -17,6 +17,19 @@ Route::get('/', function () {
     return view('dashboard');
 });
 
+// Orders
+Route::get('/orders', function () {
+    return view('orders');
+});
+
+// Products
 Route::get('/products', function () {
     return view('products');
 });
+
+// Customers
+Route::get('/customers', function () {
+    return view('customers');
+});
+
+
