@@ -3,7 +3,7 @@
    <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
-      <title>AdminLTE 3 | Dashboard</title>
+      <title>Point of Sales - Admin</title>
       <!-- Google Font: Source Sans Pro -->
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
       <!-- Font Awesome -->
@@ -127,7 +127,7 @@
                </li>
                <li class="nav-item">
                   <a href="pages/widgets.html" class="nav-link">
-                     <i class="nav-icon fas fa-receipt"></i>
+                     <i class="nav-icon fas fa-shopping-cart"></i>
                      <p>
                         POS System
                      </p>
@@ -150,19 +150,27 @@
                   </a>
                </li>
                <li class="nav-item">
-                  <a href="/customers" class="nav-link">
-                     <i class="nav-icon fas fa-user"></i>
+                  <a href="/categories" class="nav-link">
+                     <i class="nav-icon fas fa-tag"></i>
                      <p>
-                        Customer
+                        Categories
                      </p>
                   </a>
                </li>
-               <li class="nav-header">Navigation</li>
+               <li class="nav-header">Options</li>
                <li class="nav-item">
                   <a href="pages/widgets.html" class="nav-link">
-                     <i class="nav-icon fas fa-power-off"></i>
+                     <i class="nav-icon fas fa-user-circle"></i>
                      <p>
-                        LogOut
+                        User Settings
+                     </p>
+                  </a>
+               </li>
+               <li class="nav-item">
+                  <a href="pages/widgets.html" class="nav-link">
+                     <i class="nav-icon fas fa-door-open"></i>
+                     <p>
+                        Logout
                      </p>
                   </a>
                </li>

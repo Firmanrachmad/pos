@@ -27,9 +27,10 @@ Route::get('/products', function () {
     return view('products');
 });
 
-// Customers
-Route::get('/customers', function () {
-    return view('customers');
+// Products
+Route::get('/categories', function () {
+    return view('categories');
 });
+
 
 
