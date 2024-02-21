@@ -5,6 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use App\Models\Product;
+use App\Models\Category;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Product>
@@ -22,7 +23,10 @@ class ProductFactory extends Factory
     {
         $randomPhotoId = $this->faker->numberBetween(1, 1000);
 
+        $categoryId = Category::inRandomOrder()->first()->id;
+
         return [
+            'category_id' => $categoryId,
             'name' => $this->faker->name,
             'price' => $this->faker->numberBetween(10000, 100000),
             'desc' => $this->faker->sentence(5),

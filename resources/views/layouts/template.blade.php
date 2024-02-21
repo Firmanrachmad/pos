@@ -3,7 +3,7 @@
    <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
-      <title>Point of Sales - Admin</title>
+      <title>Point of Sales</title>
       <!-- Google Font: Source Sans Pro -->
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
       <!-- Font Awesome -->
@@ -113,76 +113,75 @@
                </div>
                <!-- Sidebar Menu -->
                <nav class="mt-2">
-               <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-               <!-- Add icons to the links using the .nav-icon class
-                  with font-awesome or any other icon font library -->
-               <li class="nav-header">Menu</li>
-               <li class="nav-item">
-                  <a href="/" class="nav-link">
-                     <i class="nav-icon fas fa-tachometer-alt"></i>
-                     <p>
-                        Dashboard
-                     </p>
-                  </a>
-               </li>
-               <li class="nav-item">
-                  <a href="pages/widgets.html" class="nav-link">
-                     <i class="nav-icon fas fa-shopping-cart"></i>
-                     <p>
-                        POS System
-                     </p>
-                  </a>
-               </li>
-               <li class="nav-item">
-                  <a href="/orders" class="nav-link">
-                     <i class="nav-icon fas fa-list"></i>
-                     <p>
-                        Orders
-                     </p>
-                  </a>
-               </li>
-               <li class="nav-item">
-                  <a href="/products" class="nav-link">
-                     <i class="nav-icon fas fa-box"></i>
-                     <p>
-                        Products
-                     </p>
-                  </a>
-               </li>
-               <li class="nav-item">
-                  <a href="/categories" class="nav-link">
-                     <i class="nav-icon fas fa-tag"></i>
-                     <p>
-                        Categories
-                     </p>
-                  </a>
-               </li>
-               <li class="nav-header">Options</li>
-               <li class="nav-item">
-                  <a href="pages/widgets.html" class="nav-link">
-                     <i class="nav-icon fas fa-user-circle"></i>
-                     <p>
-                        User Settings
-                     </p>
-                  </a>
-               </li>
-               <li class="nav-item">
-                  <a href="pages/widgets.html" class="nav-link">
-                     <i class="nav-icon fas fa-door-open"></i>
-                     <p>
-                        Logout
-                     </p>
-                  </a>
-               </li>
+                  <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                  <!-- Add icons to the links using the .nav-icon class
+                     with font-awesome or any other icon font library -->
+                  <li class="nav-header">Menu</li>
+                  <li class="nav-item">
+                     <a href="/" class="nav-link {{ Request::is('/') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <p>
+                           Dashboard
+                        </p>
+                     </a>
+                  </li>
+                  <li class="nav-item">
+                     <a href="pages/widgets.html" class="nav-link">
+                        <i class="nav-icon fas fa-shopping-cart"></i>
+                        <p>
+                           POS System
+                        </p>
+                     </a>
+                  </li>
+                  <li class="nav-item">
+                     <a href="/orders" class="nav-link {{ Request::is('orders') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-list"></i>
+                        <p>
+                           Orders
+                        </p>
+                     </a>
+                  </li>
+                  <li class="nav-item">
+                     <a href="/products" class="nav-link {{ Request::is('products') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-barcode"></i>
+                        <p>
+                           Products
+                        </p>
+                     </a>
+                  </li>
+                  <li class="nav-item">
+                     <a href="/categories" class="nav-link {{ Request::is('categories') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-tag"></i>
+                        <p>
+                           Categories
+                        </p>
+                     </a>
+                  </li>
+                  <li class="nav-header">Options</li>
+                  <li class="nav-item">
+                     <a href="pages/widgets.html" class="nav-link">
+                        <i class="nav-icon fas fa-user-circle"></i>
+                        <p>
+                           User Settings
+                        </p>
+                     </a>
+                  </li>
+                  <li class="nav-item">
+                     <a href="pages/widgets.html" class="nav-link">
+                        <i class="nav-icon fas fa-door-open"></i>
+                        <p>
+                           Logout
+                        </p>
+                     </a>
+                  </li>
+               </nav>
                <!-- /.sidebar-menu -->
             </div>
             <!-- /.sidebar -->
          </aside>
-
          <!-- /.content -->
          @yield('content')
          <!-- /.content-wrapper -->
-         
          <footer class="main-footer">
             <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong>
             All rights reserved.
