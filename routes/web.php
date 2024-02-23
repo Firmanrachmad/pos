@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,19 +21,13 @@ Route::get('/', function () {
 });
 
 // Orders
-Route::get('/orders', function () {
-    return view('orders');
-});
+Route::get('/orders', [OrderController::class, 'index']);
 
 // Products
-Route::get('/products', function () {
-    return view('products');
-});
+Route::get('/products', [ProductController::class, 'index']);
 
-// Products
-Route::get('/categories', function () {
-    return view('categories');
-});
+// Category
+Route::get('/categories', [CategoryController::class, 'index']);
 
 
 

@@ -48,17 +48,17 @@
                            </tr>
                         </thead>
                         <tbody>
+                           @foreach($product as $item)
                            <tr>
-                              <td>Trident</td>
-                              <td>Trident</td>
-                              <td>Internet
-                                 Explorer 4.0
-                              </td>
-                              <td>Win 95+</td>
-                              <td>Win 95+</td>
-                              <td>Win 95+</td>
+                              <td>{{$loop->iteration}}</td>
+                              <td>{{$item->category_id}}</td>
+                              <td>{{$item->name}}</td>
+                              <td>{{$item->price}}</td>
+                              <td>{{$item->desc}}</td>
+                              <td><img width="100" height="100" src="{{$item->foto}}"></td>
                               <td><button type="button" class="btn btn-white" data-toggle="modal" data-target="#modal-edit"><i class="fas fa-pen"></i></button><button type="button" class="btn btn-white" data-toggle="modal" data-target="#modal-delete"><i class="fas fa-trash"></i></button></td>
                            </tr>
+                           @endforeach
                         </tbody>
                         <tfoot>
                            <tr>

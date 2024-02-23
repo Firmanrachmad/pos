@@ -42,13 +42,13 @@
                            </tr>
                         </thead>
                         <tbody>
+                           @foreach($category as $item)
                            <tr>
-                              <td>Trident</td>
-                              <td>Internet
-                                 Explorer 4.0
-                              </td>
+                              <td>{{$loop->iteration}}</td>
+                              <td>{{$item->name}}</td>
                               <td><button type="button" class="btn btn-white" data-toggle="modal" data-target="#modal-edit"><i class="fas fa-pen"></i></button><button type="button" class="btn btn-white" data-toggle="modal" data-target="#modal-delete"><i class="fas fa-trash"></i></button></td>
                            </tr>
+                           @endforeach
                         </tbody>
                         <tfoot>
                            <tr>
@@ -80,10 +80,11 @@
          <div class="modal-header">
             <h4 class="modal-title">Add New Entry</h4>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-               <span aria-hidden="true">&times;</span>
+            <span aria-hidden="true">&times;</span>
             </button>
          </div>
-         <form id="addForm"> <!-- Tambahkan form di sini -->
+         <form id="addForm">
+            <!-- Tambahkan form di sini -->
             <div class="modal-body">
                <div class="form-group">
                   <label for="name">Name:</label>
@@ -102,8 +103,6 @@
    <!-- /.modal-dialog -->
 </div>
 <!-- /.modal -->
-
-
 <div class="modal fade" id="modal-edit">
    <div class="modal-dialog">
       <div class="modal-content">
@@ -126,27 +125,26 @@
    <!-- /.modal-dialog -->
 </div>
 <!-- /.modal -->
-
 <div class="modal fade" id="modal-delete">
-        <div class="modal-dialog">
-          <div class="modal-content bg-danger">
-            <div class="modal-header">
-              <h4 class="modal-title">Delete Data</h4>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <p>Are you sure want to delete?</p>
-            </div>
-            <div class="modal-footer justify-content-between">
-              <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-outline-light">Save changes</button>
-            </div>
-          </div>
-          <!-- /.modal-content -->
-        </div>
-        <!-- /.modal-dialog -->
+   <div class="modal-dialog">
+      <div class="modal-content bg-danger">
+         <div class="modal-header">
+            <h4 class="modal-title">Delete Data</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <p>Are you sure want to delete?</p>
+         </div>
+         <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-outline-light">Save changes</button>
+         </div>
       </div>
-      <!-- /.modal -->
+      <!-- /.modal-content -->
+   </div>
+   <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
 @endsection
