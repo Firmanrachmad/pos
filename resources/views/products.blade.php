@@ -39,11 +39,11 @@
                         <thead>
                            <tr>
                               <th>#</th>
+                              <th>Photo</th>
                               <th>Category</th>
                               <th>Name</th>
                               <th>Price</th>
                               <th>Desc</th>
-                              <th>Photo</th>
                               <th>Actions</th>
                            </tr>
                         </thead>
@@ -51,11 +51,11 @@
                            @foreach($product as $item)
                            <tr>
                               <td>{{$loop->iteration}}</td>
-                              <td>{{$item->category_id}}</td>
+                              <td><img width="100" height="100" src="{{$item->foto}}"></td>
+                              <td>{{$item->category->name}}</td>
                               <td>{{$item->name}}</td>
                               <td>{{$item->price}}</td>
                               <td>{{$item->desc}}</td>
-                              <td><img width="100" height="100" src="{{$item->foto}}"></td>
                               <td><button type="button" class="btn btn-white" data-toggle="modal" data-target="#modal-edit"><i class="fas fa-pen"></i></button><button type="button" class="btn btn-white" data-toggle="modal" data-target="#modal-delete"><i class="fas fa-trash"></i></button></td>
                            </tr>
                            @endforeach
@@ -63,11 +63,11 @@
                         <tfoot>
                            <tr>
                               <th>#</th>
+                              <th>Photo</th>
                               <th>Category</th>
                               <th>Name</th>
                               <th>Price</th>
                               <th>Desc</th>
-                              <th>Photo</th>
                               <th>Actions</th>
                            </tr>
                         </tfoot>

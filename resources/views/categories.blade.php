@@ -29,6 +29,7 @@
                      <div class="row">
                         <div class="ml-auto">
                            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#modal-add">Add New Entry</button>
+                           <!-- <button type="button" class="btn btn-primary swalDefaultSuccess">Test</button> -->
                         </div>
                      </div>
                   </div>
@@ -94,7 +95,7 @@
             </div>
             <div class="modal-footer justify-content-between">
                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-               <button type="submit" class="btn btn-primary">Save changes</button>
+               <button type="submit" class="btn btn-primary addBtn">Save changes</button>
             </div>
          </form>
       </div>
@@ -139,7 +140,7 @@
          </div>
          <div class="modal-footer justify-content-between">
             <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-outline-light">Save changes</button>
+            <button type="submit" class="btn btn-outline-light">Save changes</button>
          </div>
       </div>
       <!-- /.modal-content -->
@@ -147,4 +148,56 @@
    <!-- /.modal-dialog -->
 </div>
 <!-- /.modal -->
+<!-- jQuery -->
+<script src="{{ asset('admins/plugins/jquery/jquery.min.js') }}"></script>
+<!-- jQuery UI 1.11.4 -->
+<script src="{{ asset('admins/plugins/jquery-ui/jquery-ui.min.js') }}"></script>
+<script>
+   $(document).ready(function(){
+      var Toast = Swal.mixin({
+         toast: true,
+         position: 'top-end',
+         showConfirmButton: false,
+         timer: 3000
+      });
+      $('#addForm').submit(function(e){
+         e.preventDefault();
+         let formData = $(this).serialize();
+         $.ajax({
+            url:'',
+            data:formData,
+            contentType: false,
+            processData: false,
+            beforeSend: function(){
+               $('.addBtn').prop('disabled', true);
+            },
+            complete: function(){
+               $('.addBtn').prop('disabled', false);
+            },
+            success: function(data){
+               if(data.success == true){
+                  Toast.fire({
+                     icon: 'success',
+                     title: data.msg
+                  });
+                  $('#addModal').modal('hide');
+               } else {
+                  Toast.fire({
+                     icon: 'error',
+                     title: "Error!" + data.msg
+                  });
+               }
+            },
+            error: function(xhr, textStatus, errorThrown){
+               var errorMessage = "An error occurred: " + xhr.statusText;
+               Toast.fire({
+                  icon: 'error',
+                  title: errorMessage
+               });
+            }
+         });
+         return false;
+      });
+   });
+</script>
 @endsection

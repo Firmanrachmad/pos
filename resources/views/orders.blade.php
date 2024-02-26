@@ -38,6 +38,7 @@
                               <th>Total Amount</th>
                               <th>Notes</th>
                               <th>Time</th>
+                              <th>Action</th>
                            </tr>
                         </thead>
                         <tbody>
@@ -48,16 +49,18 @@
                               <td>{{$item->total_amount}}</td>
                               <td>{{$item->notes}}</td>
                               <td>{{$item->created_at}}</td>
+                              <td><button type="button" class="btn btn-white" data-toggle="modal" data-target="#modal-edit"><i class="fas fa-print"></i></td>
                            </tr>
                           @endforeach
                         </tbody>
                         <tfoot>
                            <tr>
-                              <th>Rendering engine</th>
-                              <th>Browser</th>
-                              <th>Platform(s)</th>
-                              <th>Engine version</th>
-                              <th>CSS grade</th>
+                              <th>#</th>
+                              <th>Order Number</th>
+                              <th>Total Amount</th>
+                              <th>Notes</th>
+                              <th>Time</th>
+                              <th>Action</th>
                            </tr>
                         </tfoot>
                      </table>

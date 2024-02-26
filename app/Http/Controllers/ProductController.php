@@ -8,7 +8,7 @@ use App\Models\Product;
 class ProductController extends Controller
 {
     public function index() {
-        $product = Product::all();
+        $product = Product::with('category')->get();
         return view('products', compact('product'));
     }
 }
