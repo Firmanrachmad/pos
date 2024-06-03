@@ -50,9 +50,14 @@
                         <tbody>
                            @foreach($product as $item)
                            <tr>
+                              
                               <td>{{$loop->iteration}}</td>
                               <td><img height="100" width="100" src="{{$item->foto}}"></td>
-                              <td>{{$item->category->name}}</td>
+                              <td>@if ($item->category)
+                                 {{ $item->category->name }}
+                              @else
+                                 Category not available
+                              @endif</td>
                               <td>{{$item->name}}</td>
                               <td>{{$item->price}}</td>
                               <td>{{$item->desc}}</td>

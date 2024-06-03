@@ -49,7 +49,7 @@
                               <td>{{$item->name}}</td>
                               <td>
                                  <button type="button" class="btn btn-white editBtn" data-id="{{ $item->id }}" data-name="{{ $item->name }}" data-toggle="modal" data-target="#modal-edit"><i class="fas fa-pen"></i></button>
-                                 <button type="button" class="btn btn-white" data-toggle="modal" data-target="#modal-delete"><i class="fas fa-trash"></i></button>
+                                 <button type="button" class="btn btn-white deleteBtn" data-id="{{ $item->id }}" data-toggle="modal" data-target="#modal-delete"><i class="fas fa-trash"></i></button>
                               </td>
                            </tr>
                            @endforeach
@@ -130,7 +130,6 @@
                <button type="submit" class="btn btn-primary">Save changes</button>
             </div>
          </form>
-         
       </div>
       <!-- /.modal-content -->
    </div>
@@ -151,7 +150,7 @@
          </div>
          <div class="modal-footer justify-content-between">
             <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-outline-light">Save changes</button>
+            <button type="button" class="btn btn-outline-light deleteConfirmBtn">Delete</button>
          </div>
       </div>
       <!-- /.modal-content -->
@@ -165,12 +164,14 @@
 <script src="{{ asset('admins/plugins/jquery-ui/jquery-ui.min.js') }}"></script>
 <script>
    $(document).ready(function(){
+      
       var Toast = Swal.mixin({
          toast: true,
          position: 'top-end',
          showConfirmButton: false,
          timer: 3000
       });
+
       $('#addForm').submit(function(e){
          e.preventDefault();
          let formData = $(this).serialize();
@@ -212,6 +213,7 @@
          });
          return false;
       });
+
       $('.editBtn').on('click',function(){
          var id = $(this).data('id');
          var name = $(this).data('name');
@@ -222,7 +224,7 @@
          $('#modal-edit').modal('show');
       });
    
-    $('#editForm').submit(function(e){
+      $('#editForm').submit(function(e){
         e.preventDefault();
         var id = $('#edit_id').val();
         var formData = $(this).serialize();
@@ -265,8 +267,45 @@
         });
         return false;
       });
-    });
-   
-    
+
+      $('.deleteBtn').on('click', function(){
+        var id = $(this).data('id'); // Dapatkan id dari atribut data-id
+        $('#modal-delete').data('id', id); // Simpan id di data modal
+        $('#modal-delete').modal('show'); // Tampilkan modal delete
+      });
+
+      $('.deleteConfirmBtn').on('click', function(){
+        var id = $('#modal-delete').data('id'); // Ambil id dari data modal
+        $.ajax({
+            url: '/categories/' + id, // Gunakan id dalam URL
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Pastikan CSRF token disertakan
+            },
+            success: function(data){
+                if(data.success == true){
+                    Swal.fire({
+                        icon: 'success',
+                        title: data.msg
+                    });
+                    $('#modal-delete').modal('hide');
+                    location.reload();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: "Error! " + data.msg
+                    });
+                }
+            },
+            error: function(xhr, textStatus, errorThrown){
+                var errorMessage = "An error occurred: " + xhr.statusText;
+                Swal.fire({
+                    icon: 'error',
+                    title: errorMessage
+                });
+            }
+        });
+      });
+   }); 
 </script>
 @endsection
