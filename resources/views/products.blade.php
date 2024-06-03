@@ -35,7 +35,7 @@
                   </div>
                   <div class="card-body">
                      
-                     <table id="example2" class="table table-bordered table-hover">
+                     <table id="example1" class="table table-bordered table-striped">
                         <thead>
                            <tr>
                               <th>#</th>
@@ -51,7 +51,7 @@
                            @foreach($product as $item)
                            <tr>
                               <td>{{$loop->iteration}}</td>
-                              <td><img width="100" height="100" src="{{$item->foto}}"></td>
+                              <td><img height="100" width="100" src="{{$item->foto}}"></td>
                               <td>{{$item->category->name}}</td>
                               <td>{{$item->name}}</td>
                               <td>{{$item->price}}</td>

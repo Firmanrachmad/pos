@@ -34,7 +34,7 @@
                      </div>
                   </div>
                   <div class="card-body">
-                     <table id="example2" class="table table-bordered table-hover">
+                     <table id="example1" class="table table-bordered table-striped">
                         <thead>
                            <tr>
                               <th>#</th>
@@ -47,7 +47,10 @@
                            <tr>
                               <td>{{$loop->iteration}}</td>
                               <td>{{$item->name}}</td>
-                              <td><button type="button" class="btn btn-white" data-toggle="modal" data-target="#modal-edit"><i class="fas fa-pen"></i></button><button type="button" class="btn btn-white" data-toggle="modal" data-target="#modal-delete"><i class="fas fa-trash"></i></button></td>
+                              <td>
+                                 <button type="button" class="btn btn-white editBtn" data-id="{{ $item->id }}" data-name="{{ $item->name }}" data-toggle="modal" data-target="#modal-edit"><i class="fas fa-pen"></i></button>
+                                 <button type="button" class="btn btn-white" data-toggle="modal" data-target="#modal-delete"><i class="fas fa-trash"></i></button>
+                              </td>
                            </tr>
                            @endforeach
                         </tbody>
@@ -84,14 +87,13 @@
             <span aria-hidden="true">&times;</span>
             </button>
          </div>
-         <form id="addForm">
-            <!-- Tambahkan form di sini -->
+         <form method="POST" id="addForm" enctype="multipart/form-data">
+            @csrf
             <div class="modal-body">
                <div class="form-group">
                   <label for="name">Name:</label>
                   <input type="text" class="form-control" id="name" name="name" placeholder="Enter name">
                </div>
-               <!-- Tambahkan input field lain jika diperlukan -->
             </div>
             <div class="modal-footer justify-content-between">
                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -113,13 +115,22 @@
             <span aria-hidden="true">&times;</span>
             </button>
          </div>
-         <div class="modal-body">
-            <p>Modal Edit&hellip;</p>
-         </div>
-         <div class="modal-footer justify-content-between">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save changes</button>
-         </div>
+         <form method="POST" id="editForm" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
+            <div class="modal-body">
+               <div class="form-group">
+                  <label for="edit_name">Name:</label>
+                  <input type="hidden" id="edit_id" name="id">
+                  <input type="text" class="form-control" id="edit_name" name="name">
+               </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+               <button type="submit" class="btn btn-primary">Save changes</button>
+            </div>
+         </form>
+         
       </div>
       <!-- /.modal-content -->
    </div>
@@ -164,10 +175,12 @@
          e.preventDefault();
          let formData = $(this).serialize();
          $.ajax({
-            url:'',
-            data:formData,
-            contentType: false,
-            processData: false,
+            url:'{{ route("categories.store") }}',
+            method: 'POST',
+            headers: {
+               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: formData,
             beforeSend: function(){
                $('.addBtn').prop('disabled', true);
             },
@@ -181,6 +194,7 @@
                      title: data.msg
                   });
                   $('#addModal').modal('hide');
+                  location.reload();
                } else {
                   Toast.fire({
                      icon: 'error',
@@ -198,6 +212,61 @@
          });
          return false;
       });
-   });
+      $('.editBtn').on('click',function(){
+         var id = $(this).data('id');
+         var name = $(this).data('name');
+   
+         $('#edit_id').val(id);
+         $('#edit_name').val(name);
+   
+         $('#modal-edit').modal('show');
+      });
+   
+    $('#editForm').submit(function(e){
+        e.preventDefault();
+        var id = $('#edit_id').val();
+        var formData = $(this).serialize();
+        $.ajax({
+            url: '/categories/' + id, 
+            method: 'PUT',
+            data: formData,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Pastikan CSRF token disertakan
+            },
+            beforeSend: function(){
+                $('.editBtn').prop('disabled', true);
+            },
+            complete: function(){
+                $('.editBtn').prop('disabled', false);
+            },
+            success: function(data){
+                if(data.success == true){
+                    Toast.fire({
+                        icon: 'success',
+                        title: data.msg
+                    });
+                    $('#modal-edit').modal('hide');
+                    // Reload halaman atau perbarui tampilan tabel jika diperlukan
+                    location.reload();
+                } else {
+                    Toast.fire({
+                        icon: 'error',
+                        title: "Error! " + data.msg
+                    });
+                }
+            },
+            error: function(xhr, textStatus, errorThrown){
+                var errorMessage = "An error occurred: " + xhr.statusText;
+                Toast.fire({
+                    icon: 'error',
+                    title: errorMessage
+                });
+            }
+        });
+        return false;
+      });
+    });
+   
+    
 </script>
 @endsection

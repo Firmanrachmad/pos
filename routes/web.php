@@ -28,6 +28,8 @@ Route::get('/products', [ProductController::class, 'index']);
 
 // Category
 Route::get('/categories', [CategoryController::class, 'index']);
+Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+Route::put('/categories/{id}', [CategoryController::class, 'update'])->name('categories.update');
 
 
 
