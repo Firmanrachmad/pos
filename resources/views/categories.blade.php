@@ -84,7 +84,7 @@
          <div class="modal-header">
             <h4 class="modal-title">Add New Entry</h4>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+               <span aria-hidden="true">&times;</span>
             </button>
          </div>
          <form method="POST" id="addForm" enctype="multipart/form-data">
@@ -112,7 +112,7 @@
          <div class="modal-header">
             <h4 class="modal-title">Edit Data</h4>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+               <span aria-hidden="true">&times;</span>
             </button>
          </div>
          <form method="POST" id="editForm" enctype="multipart/form-data">
@@ -142,7 +142,7 @@
          <div class="modal-header">
             <h4 class="modal-title">Delete Data</h4>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+               <span aria-hidden="true">&times;</span>
             </button>
          </div>
          <div class="modal-body">
@@ -153,18 +153,14 @@
             <button type="button" class="btn btn-outline-light deleteConfirmBtn">Delete</button>
          </div>
       </div>
-      <!-- /.modal-content -->
    </div>
-   <!-- /.modal-dialog -->
 </div>
-<!-- /.modal -->
-<!-- jQuery -->
+
 <script src="{{ asset('admins/plugins/jquery/jquery.min.js') }}"></script>
-<!-- jQuery UI 1.11.4 -->
 <script src="{{ asset('admins/plugins/jquery-ui/jquery-ui.min.js') }}"></script>
 <script>
-   $(document).ready(function(){
-      
+   $(document).ready(function() {
+
       var Toast = Swal.mixin({
          toast: true,
          position: 'top-end',
@@ -172,24 +168,24 @@
          timer: 3000
       });
 
-      $('#addForm').submit(function(e){
+      $('#addForm').submit(function(e) {
          e.preventDefault();
          let formData = $(this).serialize();
          $.ajax({
-            url:'{{ route("categories.store") }}',
+            url: '{{ route("categories.store") }}',
             method: 'POST',
             headers: {
                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             data: formData,
-            beforeSend: function(){
+            beforeSend: function() {
                $('.addBtn').prop('disabled', true);
             },
-            complete: function(){
+            complete: function() {
                $('.addBtn').prop('disabled', false);
             },
-            success: function(data){
-               if(data.success == true){
+            success: function(data) {
+               if (data.success == true) {
                   Toast.fire({
                      icon: 'success',
                      title: data.msg
@@ -203,7 +199,7 @@
                   });
                }
             },
-            error: function(xhr, textStatus, errorThrown){
+            error: function(xhr, textStatus, errorThrown) {
                var errorMessage = "An error occurred: " + xhr.statusText;
                Toast.fire({
                   icon: 'error',
@@ -214,98 +210,98 @@
          return false;
       });
 
-      $('.editBtn').on('click',function(){
+      $('.editBtn').on('click', function() {
          var id = $(this).data('id');
          var name = $(this).data('name');
-   
+
          $('#edit_id').val(id);
          $('#edit_name').val(name);
-   
+
          $('#modal-edit').modal('show');
       });
-   
-      $('#editForm').submit(function(e){
-        e.preventDefault();
-        var id = $('#edit_id').val();
-        var formData = $(this).serialize();
-        $.ajax({
-            url: '/categories/' + id, 
+
+      $('#editForm').submit(function(e) {
+         e.preventDefault();
+         var id = $('#edit_id').val();
+         var formData = $(this).serialize();
+         $.ajax({
+            url: '/categories/' + id,
             method: 'PUT',
             data: formData,
             headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Pastikan CSRF token disertakan
+               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Pastikan CSRF token disertakan
             },
-            beforeSend: function(){
-                $('.editBtn').prop('disabled', true);
+            beforeSend: function() {
+               $('.editBtn').prop('disabled', true);
             },
-            complete: function(){
-                $('.editBtn').prop('disabled', false);
+            complete: function() {
+               $('.editBtn').prop('disabled', false);
             },
-            success: function(data){
-                if(data.success == true){
-                    Toast.fire({
-                        icon: 'success',
-                        title: data.msg
-                    });
-                    $('#modal-edit').modal('hide');
-                    // Reload halaman atau perbarui tampilan tabel jika diperlukan
-                    location.reload();
-                } else {
-                    Toast.fire({
-                        icon: 'error',
-                        title: "Error! " + data.msg
-                    });
-                }
+            success: function(data) {
+               if (data.success == true) {
+                  Toast.fire({
+                     icon: 'success',
+                     title: data.msg
+                  });
+                  $('#modal-edit').modal('hide');
+                  // Reload halaman atau perbarui tampilan tabel jika diperlukan
+                  location.reload();
+               } else {
+                  Toast.fire({
+                     icon: 'error',
+                     title: "Error! " + data.msg
+                  });
+               }
             },
-            error: function(xhr, textStatus, errorThrown){
-                var errorMessage = "An error occurred: " + xhr.statusText;
-                Toast.fire({
-                    icon: 'error',
-                    title: errorMessage
-                });
+            error: function(xhr, textStatus, errorThrown) {
+               var errorMessage = "An error occurred: " + xhr.statusText;
+               Toast.fire({
+                  icon: 'error',
+                  title: errorMessage
+               });
             }
-        });
-        return false;
+         });
+         return false;
       });
 
-      $('.deleteBtn').on('click', function(){
-        var id = $(this).data('id'); // Dapatkan id dari atribut data-id
-        $('#modal-delete').data('id', id); // Simpan id di data modal
-        $('#modal-delete').modal('show'); // Tampilkan modal delete
+      $('.deleteBtn').on('click', function() {
+         var id = $(this).data('id'); // Dapatkan id dari atribut data-id
+         $('#modal-delete').data('id', id); // Simpan id di data modal
+         $('#modal-delete').modal('show'); // Tampilkan modal delete
       });
 
-      $('.deleteConfirmBtn').on('click', function(){
-        var id = $('#modal-delete').data('id'); // Ambil id dari data modal
-        $.ajax({
+      $('.deleteConfirmBtn').on('click', function() {
+         var id = $('#modal-delete').data('id'); // Ambil id dari data modal
+         $.ajax({
             url: '/categories/' + id, // Gunakan id dalam URL
             method: 'DELETE',
             headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Pastikan CSRF token disertakan
+               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Pastikan CSRF token disertakan
             },
-            success: function(data){
-                if(data.success == true){
-                    Swal.fire({
-                        icon: 'success',
-                        title: data.msg
-                    });
-                    $('#modal-delete').modal('hide');
-                    location.reload();
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: "Error! " + data.msg
-                    });
-                }
+            success: function(data) {
+               if (data.success == true) {
+                  Swal.fire({
+                     icon: 'success',
+                     title: data.msg
+                  });
+                  $('#modal-delete').modal('hide');
+                  location.reload();
+               } else {
+                  Swal.fire({
+                     icon: 'error',
+                     title: "Error! " + data.msg
+                  });
+               }
             },
-            error: function(xhr, textStatus, errorThrown){
-                var errorMessage = "An error occurred: " + xhr.statusText;
-                Swal.fire({
-                    icon: 'error',
-                    title: errorMessage
-                });
+            error: function(xhr, textStatus, errorThrown) {
+               var errorMessage = "An error occurred: " + xhr.statusText;
+               Swal.fire({
+                  icon: 'error',
+                  title: errorMessage
+               });
             }
-        });
+         });
       });
-   }); 
+   });
 </script>
 @endsection

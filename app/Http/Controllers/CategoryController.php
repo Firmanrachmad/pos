@@ -52,7 +52,7 @@ class CategoryController extends Controller
         }
     }
 
-    public function destroy(Request $request, $id) {
+    public function destroy($id) {
         try {
             $category = Category::find($id);
             if ($category) {
