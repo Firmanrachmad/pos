@@ -1,7 +1,6 @@
 @extends('layouts.template')
 @section('content')
 <div class="content-wrapper">
-   <!-- Content Header (Page header) -->
    <section class="content-header">
       <div class="container-fluid">
          <div class="row mb-2">
@@ -17,7 +16,6 @@
          </div>
       </div>
    </section>
-   <!-- Main content -->
    <section class="content">
       <div class="container-fluid">
          <div class="row">
@@ -26,7 +24,7 @@
                   <div class="card-header">
                      <div class="row">
                         <div class="ml-auto">
-                           <button type="button" class="btn btn-success" data-toggle="modal" data-target="#modal-add">Add New Entry</button>
+                           <button type="button" class="btn btn-success" onclick="showAddModal()">Add New Entry</button>
                         </div>
                      </div>
                   </div>
@@ -35,43 +33,23 @@
                         <thead>
                            <tr>
                               <th>#</th>
-                              <th>Photo</th>
                               <th>Category</th>
                               <th>Name</th>
                               <th>Price</th>
-                              <th>Desc</th>
+                              <th>Description</th>
+                              <th>Photo</th>
                               <th>Actions</th>
                            </tr>
                         </thead>
-                        <tbody>
-                           @foreach($product as $item)
-                           <tr>
-                              <td>{{$loop->iteration}}</td>
-                              <td><img height="100" width="100" src="{{$item->foto}}"></td>
-                              <td>@if ($item->category)
-                                 {{ $item->category->name }}
-                                 @else
-                                 Category not available
-                                 @endif
-                              </td>
-                              <td>{{$item->name}}</td>
-                              <td>Rp. {{$item->price}}</td>
-                              <td>{{$item->desc}}</td>
-                              <td>
-                                 <button type="button" class="btn btn-white editBtn" data-toggle="modal" data-id="{{ $item->id }}" data-name="{{ $item->name }}" data-toggle="modal" data-target="#modal-edit"><i class="fas fa-pen"></i></button>
-                                 <button type="button" class="btn btn-white deleteBtn" data-toggle="modal" data-id="{{ $item->id }}" data-toggle="modal" data-target="#modal-delete"><i class="fas fa-trash"></i></button>
-                              </td>
-                           </tr>
-                           @endforeach
-                        </tbody>
+                        <tbody id='productTable'></tbody>
                         <tfoot>
                            <tr>
                               <th>#</th>
-                              <th>Photo</th>
                               <th>Category</th>
                               <th>Name</th>
                               <th>Price</th>
-                              <th>Desc</th>
+                              <th>Description</th>
+                              <th>Photo</th>
                               <th>Actions</th>
                            </tr>
                         </tfoot>
@@ -84,275 +62,147 @@
    </section>
 </div>
 
-<div class="modal fade" id="modal-add">
-   <div class="modal-dialog">
+<div class="modal fade" id="productModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+   <div class="modal-dialog" role="document">
       <div class="modal-content">
          <div class="modal-header">
-            <h4 class="modal-title">Add New Product</h4>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-               <span aria-hidden="true">&times;</span>
-            </button>
-         </div>
-         <form method="POST" id="addForm" enctype="multipart/form-data">
-            @csrf
-            <div class="modal-body">
-               <div class="form-group">
-                  <label for="category_id">Category:</label>
-                  <select class="form-control" id="category_id" name="category_id">
-                     @foreach($category as $item)
-                     <option value="{{$item->id}}">{{$item->name}}</option>
-                     @endforeach
-                  </select>
-               </div>
-               <div class="form-group">
-                  <label for="name">Name:</label>
-                  <input type="text" class="form-control" id="name" name="name" placeholder="Enter name">
-               </div>
-               <div class="form-group">
-                  <label for="price">Price:</label>
-                  <input type="number" class="form-control" id="price" name="price" placeholder="Enter price">
-               </div>
-               <div class="form-group">
-                  <label for="desc">Description:</label>
-                  <textarea class="form-control" id="desc" name="desc" placeholder="Enter description"></textarea>
-               </div>
-               <div class="form-group">
-                  <label for="foto">Photo:</label>
-                  <input type="file" class="form-control-file" id="foto" name="foto">
-               </div>
-            </div>
-            <div class="modal-footer justify-content-between">
-               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-               <button type="submit" class="btn btn-primary addBtn">Save changes</button>
-            </div>
-         </form>
-      </div>
-   </div>
-</div>
-
-<div class="modal fade" id="modal-edit">
-   <div class="modal-dialog">
-      <div class="modal-content">
-         <div class="modal-header">
-            <h4 class="modal-title">Edit Data</h4>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-               <span aria-hidden="true">&times;</span>
-            </button>
-         </div>
-         <form method="POST" id="editForm" enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
-            <input type="hidden" id="edit_id" name="id">
-            <div class="modal-body">
-               <div class="form-group">
-                  <label for="category_id">Category:</label>
-                  <select class="form-control" id="category_id" name="category_id">
-                     @foreach($category as $item)
-                     <option value="{{$item->id}}">{{$item->name}}</option>
-                     @endforeach
-                  </select>
-               </div>
-               <div class="form-group">
-                  <label for="edit_name">Name:</label>
-                  <input type="text" class="form-control" id="edit_name" name="name">
-               </div>
-               <div class="form-group">
-                  <label for="edit_price">Price:</label>
-                  <input type="number" class="form-control" id="edit_price" name="price">
-               </div>
-               <div class="form-group">
-                  <label for="edit_desc">Desc:</label>
-                  <textarea class="form-control" id="edit_desc" name="desc"></textarea>
-               </div>
-               <div class="form-group">
-                  <label for="edit_foto">Photo:</label>
-                  <input type="file" class="form-control" id="edit_foto" name="foto">
-               </div>
-            </div>
-            <div class="modal-footer justify-content-between">
-               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-               <button type="submit" class="btn btn-primary">Save changes</button>
-            </div>
-         </form>
-      </div>
-   </div>
-</div>
-
-<div class="modal fade" id="modal-delete">
-   <div class="modal-dialog">
-      <div class="modal-content bg-danger">
-         <div class="modal-header">
-            <h4 class="modal-title">Delete Data</h4>
+            <h5 class="modal-title" id="modalLabel">Add Product</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                <span aria-hidden="true">&times;</span>
             </button>
          </div>
          <div class="modal-body">
-            <p>Are you sure want to delete?</p>
+            <form id="productForm">
+               <input type="hidden" id="productId">
+               <div class="mb-3">
+                  <label for="productCategory">Category</label>
+                  <select class="form-control" id="productCategory" required>
+                  </select>
+               </div>
+               <div class="form-group">
+                  <label for="productName">Name</label>
+                  <input type="text" class="form-control" id="productName" required>
+               </div>
+               <div class="mb-3">
+                   <label for="productPrice">Price</label>
+                   <input type="number" class="form-control" id="productPrice" required>
+               </div>
+               <div class="mb-3">
+                   <label for="productDesc">Description</label>
+                   <input type="text" class="form-control" id="productDesc" required>
+               </div>
+               <div class="mb-3">
+                   <label for="productPhoto">Photo</label>
+                   <input type="file" class="form-control" id="productPhoto" required>
+               </div>
+            </form>
          </div>
-         <div class="modal-footer justify-content-between">
-            <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-outline-light deleteConfirmBtn">Save changes</button>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="saveProduct()">Save changes</button>
          </div>
       </div>
    </div>
 </div>
 
-<script src="{{ asset('admins/plugins/jquery/jquery.min.js') }}"></script>
-<script src="{{ asset('admins/plugins/jquery-ui/jquery-ui.min.js') }}"></script>
+
 <script>
-   $(document).ready(function() {
+   const productTable = document.getElementById('productTable')
+   const productModal = document.getElementById('productModal')
+   const productCategory = document.getElementById('productCategory')
 
-      var Toast = Swal.mixin({
-         toast: true,
-         position: 'top-end',
-         showConfirmButton: false,
-         timer: 3000
-      });
+   async function fetchCategories() {
+    const res = await fetch('api/category');
+    const data = await res.json();
+    productCategory.innerHTML = data.data.map(cat => `
+        <option value="${cat.id}">${cat.name}</option>
+      `).join('');
+   }
 
-      $('#addForm').submit(function(e) {
-         e.preventDefault();
-         var formData = new FormData(this);
+   async function fetchProduct(){
+      const res = await fetch('api/product');
+      const data = await res.json();
+      productTable.innerHTML = data.data.map(prd => `
+        <tr>
+          <td>${prd.id}</td>
+          <td>${prd.category && prd.category.name ? prd.category.name : 'Kategori Tidak Tersedia'}</td>
+          <td>${prd.name}</td>
+          <td>${prd.price}</td>
+          <td>${prd.desc}</td>
+          <td><img height="100" width="100" src="${prd.foto}" alt="${prd.name}"></td>
+          <td>
+            <a class="btn btn-info btn-sm" onclick="showEditModal(${prd.id},  ${prd.category && prd.category.id ? prd.category.id : ''}, '${prd.name}', ${prd.price}, '${prd.desc}', '${prd.foto}')">
+                    <i class="fas fa-pencil-alt"></i>Edit
+                </a>
+                <a class="btn btn-danger btn-sm" onclick="deleteProduct(${prd.id})">
+                    <i class="fas fa-trash"></i>Delete
+                </a>
+          </td>
+        </tr>
+      `).join('');
+   }
 
-         $.ajax({
-            url: '{{ route("products.store") }}',
-            method: 'POST',
-            headers: {
-               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            data: formData,
-            contentType: false,
-            processData: false,
-            beforeSend: function() {
-               $('.addBtn').prop('disabled', true);
-            },
-            complete: function() {
-               $('.addBtn').prop('disabled', false);
-            },
-            success: function(data) {
-               if (data.success == true) {
-                  Toast.fire({
-                     icon: 'success',
-                     title: data.msg
-                  });
-                  $('#modal-add').modal('hide');
-                  location.reload();
-               } else {
-                  Toast.fire({
-                     icon: 'error',
-                     title: "Error! " + data.msg
-                  });
-               }
-            },
-            error: function(xhr, textStatus, errorThrown) {
-               var errorMessage = "An error occurred: " + xhr.statusText;
-               console.log(xhr.responseJSON);
-               Toast.fire({
-                  icon: 'error',
-                  title: errorMessage
-               });
-            }
-         });
-         return false;
-      });
+   function showAddModal(){
+      $('#productModal').modal('show');
+      document.getElementById('modalLabel').textContent = 'Add Product'
+      document.getElementById('productForm').reset()
+      document.getElementById('productId').value = ''
+   }
 
-      $('.editBtn').on('click', function() {
-         var id = $(this).data('id');
-         var name = $(this).data('name');
-         var price = $(this).data('price');
-         var desc = $(this).data('desc');
-         var foto = $(this).data('foto');
+   function showEditModal(id, categoryId, name, price, desc, foto) {
+      $('#productModal').modal('show');
+      document.getElementById('modalLabel').textContent = 'Edit Product'
+      document.getElementById('productId').value = id
+      document.getElementById('productCategory').value = categoryId || ''
+      document.getElementById('productName').value = name
+      document.getElementById('productPrice').value = price
+      document.getElementById('productDesc').value = desc
+      document.getElementById('productPhoto').value = foto
+   }
 
-         $('#edit_id').val(id);
-         $('#edit_name').val(name);
-         $('#edit_price').val(price);
-         $('#edit_desc').val(desc);
-         $('#edit_foto').val(foto);
+   async function saveProduct(){
+      const id = document.getElementById('productId').value
+      const category = document.getElementById('productCategory').value
+      const name = document.getElementById('productName').value
+      const price = document.getElementById('productPrice').value
+      const desc = document.getElementById('productDesc').value
+      const foto = document.getElementById('productPhoto').files[0]
 
-         $('#modal-edit').modal('show');
-      });
+      const formData = new FormData();
+         formData.append('name', name)
+         formData.append('price', price)
+         formData.append('desc', desc)
+         formData.append('category_id', category)
+         if (foto) {
+            formData.append('foto', foto)
+         }
 
-      $('#editForm').submit(function(e) {
-         e.preventDefault();
-         var id = $('#edit_id').val();
-         var formData = $(this).serialize();
-         $.ajax({
-            url: '/products/' + id,
-            method: 'PUT',
-            data: formData,
-            headers: {
-               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Pastikan CSRF token disertakan
-            },
-            beforeSend: function() {
-               $('.editBtn').prop('disabled', true);
-            },
-            complete: function() {
-               $('.editBtn').prop('disabled', false);
-            },
-            success: function(data) {
-               if (data.success == true) {
-                  Toast.fire({
-                     icon: 'success',
-                     title: data.msg
-                  });
-                  $('#modal-edit').modal('hide');
-                  location.reload();
-               } else {
-                  Toast.fire({
-                     icon: 'error',
-                     title: "Error! " + data.msg
-                  });
-               }
-            },
-            error: function(xhr, textStatus, errorThrown) {
-               var errorMessage = "An error occurred: " + xhr.statusText;
-               Toast.fire({
-                  icon: 'error',
-                  title: errorMessage
-               });
-            }
-         });
-         return false;
-      });
+         const method = id ? 'PUT' : 'POST'
+         const url = id ? `api/edit-product/${id}` : `api/add-product`
 
-      $('.deleteBtn').on('click', function() {
-         var id = $(this).data('id'); // Dapatkan id dari atribut data-id
-         $('#modal-delete').data('id', id); // Simpan id di data modal
-         $('#modal-delete').modal('show'); // Tampilkan modal delete
-      });
+         try {
+            const response = await fetch(url, {
+               method,
+               body: formData
+            });
 
-      $('.deleteConfirmBtn').on('click', function() {
-         var id = $('#modal-delete').data('id'); // Ambil id dari data modal
-         $.ajax({
-            url: '/products/' + id, // Gunakan id dalam URL
-            method: 'DELETE',
-            headers: {
-               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Pastikan CSRF token disertakan
-            },
-            success: function(data) {
-               if (data.success == true) {
-                  Swal.fire({
-                     icon: 'success',
-                     title: data.msg
-                  });
-                  $('#modal-delete').modal('hide');
-                  location.reload();
-               } else {
-                  Swal.fire({
-                     icon: 'error',
-                     title: "Error! " + data.msg
-                  });
-               }
-            },
-            error: function(xhr, textStatus, errorThrown) {
-               var errorMessage = "An error occurred: " + xhr.statusText;
-               Swal.fire({
-                  icon: 'error',
-                  title: errorMessage
-               });
-            }
-         });
-      });
-   });
+            $('#productModal').modal('hide');
+            fetchProduct();
+         } catch (error) {
+            console.error('Error saving product:', error);
+         }
+
+      $('#productModal').modal('hide');
+      fetchProduct()
+   }
+
+   async function deleteProduct(id) {
+      await fetch(`api/delete-product/${id}`, {method:'DELETE'})
+      fetchProduct()
+   }
+
+   fetchCategories()
+   fetchProduct()
+
 </script>
 @endsection

@@ -33,6 +33,9 @@
       <link rel="stylesheet" href="{{ asset('admins/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') }}">
       <!-- Toastr -->
       <link rel="stylesheet" href="{{ asset('admins/plugins/toastr/toastr.min.css') }}">
+      <script src="{{ asset('admins/plugins/jquery/jquery.min.js') }}"></script>
+      <script src="{{ asset('admins/plugins/jquery-ui/jquery-ui.min.js') }}"></script>
+
    </head>
    <body class="hold-transition sidebar-mini layout-fixed">
       <div class="wrapper">
@@ -121,7 +124,7 @@
                   <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                   <!-- Add icons to the links using the .nav-icon class
                      with font-awesome or any other icon font library -->
-                  <li class="nav-header">Menu</li>
+                  <li class="nav-header">Main Menu</li>
                   <li class="nav-item">
                      <a href="/" class="nav-link {{ Request::is('/') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -138,6 +141,7 @@
                         </p>
                      </a>
                   </li>
+                  <li class="nav-header">Data Master</li>
                   <li class="nav-item">
                      <a href="/orders" class="nav-link {{ Request::is('orders') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-list"></i>

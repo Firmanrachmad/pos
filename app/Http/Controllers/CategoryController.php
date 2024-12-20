@@ -9,60 +9,93 @@ class CategoryController extends Controller
 {
     public function index() {
         $category = Category::all();
-        return view('categories', compact('category'));
+        return response()->json([
+            'status' => 'success',
+            'data' => $category
+        ]);
     }
 
     public function store(Request $request) {
-        // Validasi input
+
         $request->validate([
             'name' => 'required|max:255',
         ]);
 
         try {
-            // Simpan data ke database
-            $category = new Category;
-            $category->name = $request->name;
-            $category->save();
+            
+            $category = Category::create($request->all());
+            return response()->json([
+                'message' => 'Category added successfully', 
+                'data' => $category
+            ]);
 
-            // Berhasil menyimpan, kirim respon JSON
-            return response()->json(['success' => true, 'msg' => 'Category added successfully']);
         } catch (\Exception $e) {
-            // Gagal menyimpan, kirim respon JSON dengan pesan kesalahan
-            return response()->json(['success' => false, 'msg' => $e->getMessage()]);
+            
+            return response()->json([
+                'status' => 'failed',
+                'message' => $e->getMessage()
+            ]);
+
         }
     }
 
     public function update(Request $request, $id) {
-        // Validasi input
+        
         $request->validate([
             'name' => 'required|max:255',
         ]);
     
         try {
-            // Perbarui data di database
+
             $category = Category::find($id);
-            $category->name = $request->name;
-            $category->save();
+
+            if(!$category){
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Category not found'
+                ]);
+            }
+
+            $category->update($request->all());
     
-            // Berhasil diperbarui, kirim respon JSON
-            return response()->json(['success' => true, 'msg' => 'Category updated successfully']);
+            return response()->json([
+                'status' => 'success', 
+                'message' => 'Category updated successfully',
+                'data' => $category
+            ]);
+
         } catch (\Exception $e) {
-            // Gagal diperbarui, kirim respon JSON dengan pesan kesalahan
-            return response()->json(['success' => false, 'msg' => $e->getMessage()]);
+            
+            return response()->json([
+                'status' => 'failed', 
+                'message' => $e->getMessage()]);
+
         }
     }
 
     public function destroy($id) {
         try {
+
             $category = Category::find($id);
-            if ($category) {
-                $category->delete();
-                return response()->json(['success' => true, 'msg' => 'Category deleted successfully']);
-            } else {
-                return response()->json(['success' => false, 'msg' => 'Category not found']);
+
+            if(!$category){
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Category not found'
+                ]);
             }
+
+            $category->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Category deleted'
+            ]);
+
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'msg' => $e->getMessage()]);
+            return response()->json([
+                'status' => 'failed', 
+                'message' => $e->getMessage()]);
         }
     }
 }

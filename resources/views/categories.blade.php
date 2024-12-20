@@ -28,8 +28,7 @@
                   <div class="card-header">
                      <div class="row">
                         <div class="ml-auto">
-                           <button type="button" class="btn btn-success" data-toggle="modal" data-target="#modal-add">Add New Entry</button>
-                           <!-- <button type="button" class="btn btn-primary swalDefaultSuccess">Test</button> -->
+                           <button type="button" class="btn btn-success" onclick="showAddModal()">Add New Entry</button>
                         </div>
                      </div>
                   </div>
@@ -42,18 +41,7 @@
                               <th>Actions</th>
                            </tr>
                         </thead>
-                        <tbody>
-                           @foreach($category as $item)
-                           <tr>
-                              <td>{{$loop->iteration}}</td>
-                              <td>{{$item->name}}</td>
-                              <td>
-                                 <button type="button" class="btn btn-white editBtn" data-id="{{ $item->id }}" data-name="{{ $item->name }}" data-toggle="modal" data-target="#modal-edit"><i class="fas fa-pen"></i></button>
-                                 <button type="button" class="btn btn-white deleteBtn" data-id="{{ $item->id }}" data-toggle="modal" data-target="#modal-delete"><i class="fas fa-trash"></i></button>
-                              </td>
-                           </tr>
-                           @endforeach
-                        </tbody>
+                        <tbody id='categoryTable'></tbody>
                         <tfoot>
                            <tr>
                               <th>#</th>
@@ -63,245 +51,97 @@
                         </tfoot>
                      </table>
                   </div>
-                  <!-- /.card-body -->
                </div>
-               <!-- /.card -->
             </div>
-            <!-- /.col -->
          </div>
-         <!-- /.row -->
       </div>
-      <!-- /.container-fluid -->
    </section>
-   <!-- /.content -->
 </div>
-<!-- /.container-fluid -->
-</section>
-<!-- /.content -->
-<div class="modal fade" id="modal-add">
-   <div class="modal-dialog">
+
+<div class="modal fade" id="categoryModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+   <div class="modal-dialog" role="document">
       <div class="modal-content">
          <div class="modal-header">
-            <h4 class="modal-title">Add New Entry</h4>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-               <span aria-hidden="true">&times;</span>
-            </button>
-         </div>
-         <form method="POST" id="addForm" enctype="multipart/form-data">
-            @csrf
-            <div class="modal-body">
-               <div class="form-group">
-                  <label for="name">Name:</label>
-                  <input type="text" class="form-control" id="name" name="name" placeholder="Enter name">
-               </div>
-            </div>
-            <div class="modal-footer justify-content-between">
-               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-               <button type="submit" class="btn btn-primary addBtn">Save changes</button>
-            </div>
-         </form>
-      </div>
-      <!-- /.modal-content -->
-   </div>
-   <!-- /.modal-dialog -->
-</div>
-<!-- /.modal -->
-<div class="modal fade" id="modal-edit">
-   <div class="modal-dialog">
-      <div class="modal-content">
-         <div class="modal-header">
-            <h4 class="modal-title">Edit Data</h4>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-               <span aria-hidden="true">&times;</span>
-            </button>
-         </div>
-         <form method="POST" id="editForm" enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
-            <div class="modal-body">
-               <div class="form-group">
-                  <label for="edit_name">Name:</label>
-                  <input type="hidden" id="edit_id" name="id">
-                  <input type="text" class="form-control" id="edit_name" name="name">
-               </div>
-            </div>
-            <div class="modal-footer justify-content-between">
-               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-               <button type="submit" class="btn btn-primary">Save changes</button>
-            </div>
-         </form>
-      </div>
-      <!-- /.modal-content -->
-   </div>
-   <!-- /.modal-dialog -->
-</div>
-<!-- /.modal -->
-<div class="modal fade" id="modal-delete">
-   <div class="modal-dialog">
-      <div class="modal-content bg-danger">
-         <div class="modal-header">
-            <h4 class="modal-title">Delete Data</h4>
+            <h5 class="modal-title" id="modalLabel">Add Category</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                <span aria-hidden="true">&times;</span>
             </button>
          </div>
          <div class="modal-body">
-            <p>Are you sure want to delete?</p>
+            <form id="categoryForm">
+               <input type="hidden" id="categoryId">
+               <div class="form-group">
+                  <label for="categoryName">Name</label>
+                  <input type="text" class="form-control" id="categoryName" required>
+               </div>
+            </form>
          </div>
-         <div class="modal-footer justify-content-between">
-            <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-outline-light deleteConfirmBtn">Delete</button>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="saveCategory()">Save changes</button>
          </div>
       </div>
    </div>
 </div>
 
-<script src="{{ asset('admins/plugins/jquery/jquery.min.js') }}"></script>
-<script src="{{ asset('admins/plugins/jquery-ui/jquery-ui.min.js') }}"></script>
+
 <script>
-   $(document).ready(function() {
+   const categoryTable = document.getElementById('categoryTable')
+   const categoryModal = document.getElementById('categoryModal')
 
-      var Toast = Swal.mixin({
-         toast: true,
-         position: 'top-end',
-         showConfirmButton: false,
-         timer: 3000
-      });
+   async function fetchCategory(){
+      const res = await fetch('api/category');
+      const data = await res.json();
+      categoryTable.innerHTML = data.data.map(ctg => `
+        <tr>
+          <td>${ctg.id}</td>
+          <td>${ctg.name}</td>
+          <td>
+            <a class="btn btn-info btn-sm" onclick="showEditModal(${ctg.id}, '${ctg.name}')"><i class="fas fa-pencil-alt"></i>Edit</a>
+            <a class="btn btn-danger btn-sm" onclick="deleteCategory(${ctg.id})"><i class="fas fa-trash"></i>Delete</a>
+          </td>
+        </tr>
+      `).join('');
+   }
 
-      $('#addForm').submit(function(e) {
-         e.preventDefault();
-         let formData = $(this).serialize();
-         $.ajax({
-            url: '{{ route("categories.store") }}',
-            method: 'POST',
-            headers: {
-               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            data: formData,
-            beforeSend: function() {
-               $('.addBtn').prop('disabled', true);
-            },
-            complete: function() {
-               $('.addBtn').prop('disabled', false);
-            },
-            success: function(data) {
-               if (data.success == true) {
-                  Toast.fire({
-                     icon: 'success',
-                     title: data.msg
-                  });
-                  $('#addModal').modal('hide');
-                  location.reload();
-               } else {
-                  Toast.fire({
-                     icon: 'error',
-                     title: "Error!" + data.msg
-                  });
-               }
-            },
-            error: function(xhr, textStatus, errorThrown) {
-               var errorMessage = "An error occurred: " + xhr.statusText;
-               Toast.fire({
-                  icon: 'error',
-                  title: errorMessage
-               });
-            }
-         });
-         return false;
-      });
+   function showAddModal(){
+      $('#categoryModal').modal('show');
+      document.getElementById('modalLabel').textContent = 'Add Category'
+      document.getElementById('categoryForm').reset()
+      document.getElementById('categoryId').value = ''
+   }
 
-      $('.editBtn').on('click', function() {
-         var id = $(this).data('id');
-         var name = $(this).data('name');
+   function showEditModal(id, name) {
+      $('#categoryModal').modal('show');
+      document.getElementById('modalLabel').textContent = 'Edit Category'
+      document.getElementById('categoryId').value = id
+      document.getElementById('categoryName').value = name
+   }
 
-         $('#edit_id').val(id);
-         $('#edit_name').val(name);
+   async function saveCategory(){
+      const id = document.getElementById('categoryId').value
+      const name = document.getElementById('categoryName').value
 
-         $('#modal-edit').modal('show');
-      });
+      const payload = { id, name }
+      const method = id ? 'PUT' : 'POST'
+      const url = id ? `api/edit-category/${id}` : `api/add-category`
 
-      $('#editForm').submit(function(e) {
-         e.preventDefault();
-         var id = $('#edit_id').val();
-         var formData = $(this).serialize();
-         $.ajax({
-            url: '/categories/' + id,
-            method: 'PUT',
-            data: formData,
-            headers: {
-               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Pastikan CSRF token disertakan
-            },
-            beforeSend: function() {
-               $('.editBtn').prop('disabled', true);
-            },
-            complete: function() {
-               $('.editBtn').prop('disabled', false);
-            },
-            success: function(data) {
-               if (data.success == true) {
-                  Toast.fire({
-                     icon: 'success',
-                     title: data.msg
-                  });
-                  $('#modal-edit').modal('hide');
-                  // Reload halaman atau perbarui tampilan tabel jika diperlukan
-                  location.reload();
-               } else {
-                  Toast.fire({
-                     icon: 'error',
-                     title: "Error! " + data.msg
-                  });
-               }
-            },
-            error: function(xhr, textStatus, errorThrown) {
-               var errorMessage = "An error occurred: " + xhr.statusText;
-               Toast.fire({
-                  icon: 'error',
-                  title: errorMessage
-               });
-            }
-         });
-         return false;
-      });
+         await fetch(url, {
+            method,
+            headers: { 'Content-Type' : 'application/json'},
+            body: JSON.stringify(payload)
+         })
 
-      $('.deleteBtn').on('click', function() {
-         var id = $(this).data('id'); // Dapatkan id dari atribut data-id
-         $('#modal-delete').data('id', id); // Simpan id di data modal
-         $('#modal-delete').modal('show'); // Tampilkan modal delete
-      });
+      $('#categoryModal').modal('hide');
+      fetchCategory()
+   }
 
-      $('.deleteConfirmBtn').on('click', function() {
-         var id = $('#modal-delete').data('id'); // Ambil id dari data modal
-         $.ajax({
-            url: '/categories/' + id, // Gunakan id dalam URL
-            method: 'DELETE',
-            headers: {
-               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Pastikan CSRF token disertakan
-            },
-            success: function(data) {
-               if (data.success == true) {
-                  Swal.fire({
-                     icon: 'success',
-                     title: data.msg
-                  });
-                  $('#modal-delete').modal('hide');
-                  location.reload();
-               } else {
-                  Swal.fire({
-                     icon: 'error',
-                     title: "Error! " + data.msg
-                  });
-               }
-            },
-            error: function(xhr, textStatus, errorThrown) {
-               var errorMessage = "An error occurred: " + xhr.statusText;
-               Swal.fire({
-                  icon: 'error',
-                  title: errorMessage
-               });
-            }
-         });
-      });
-   });
+   async function deleteCategory(id) {
+      await fetch(`api/delete-category/${id}`, {method:'DELETE'})
+      fetchCategory()
+   }
+
+   fetchCategory()
+
 </script>
 @endsection

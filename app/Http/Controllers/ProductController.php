@@ -11,16 +11,18 @@ class ProductController extends Controller
 {
     public function index() {
         $product = Product::with('category')->get();
-        $category = Category::all();
-        return view('products', compact('product', 'category'));
+        return response()->json([
+            'status' => 'successs',
+            'data' => $product
+        ]);
     }
 
     public function store(Request $request) {
         
         $request->validate([
-            'category_id' => 'required|max:255',
+            'category_id' => 'required|exists:categories,id',
             'name' => 'required|max:255',
-            'price' => 'required|max:255',
+            'price' => 'required|numeric',
             'desc' => 'required|max:255',
             'foto' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
@@ -28,41 +30,66 @@ class ProductController extends Controller
         try {
             $path = $request->file('foto')->store('public/images');
 
-            
-            $product = new Product;
-            $product->category_id = $request->category_id;
-            $product->name = $request->name;
-            $product->price = $request->price;
-            $product->desc = $request->desc;
-            $product->foto = Storage::url($path);
+            $product = Product::create([
+                'category_id' => $request->category_id,
+                'name' => $request->name,
+                'price' => $request->price,
+                'desc' => $request->desc,
+                'foto' => Storage::url($path),
+            ]);
 
-            $product->save();
-
-            // Berhasil menyimpan, kirim respon JSON
-            return response()->json(['success' => true, 'msg' => 'Product added successfully']);
+            return response()->json([
+                'status' => 'success', 
+                'message' => 'Product added successfully',
+                'data' => $product
+            ]);
         } catch (\Exception $e) {
-            // Gagal menyimpan, kirim respon JSON dengan pesan kesalahan
-            return response()->json(['success' => false, 'msg' => $e->getMessage()]);
+            return response()->json([
+                'status' => 'failed', 
+                'message' => $e->getMessage()]);
         }
     }
 
     public function update(Request $request, $id) {
-        // Validasi input
+        
         $request->validate([
+            'category_id' => 'required|exists:categories,id',
             'name' => 'required|max:255',
+            'price' => 'required|numeric',
+            'desc' => 'required|max:255',
+            'foto' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
+
     
         try {
-            // Perbarui data di database
+            
             $product = Product::find($id);
-            $product->name = $request->name;
-            $product->save();
+
+            if(!$product){
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Product not found'
+                ]);
+            }
+
+
+            if($request->foto){
+                $path = $request->file('foto')->store('public/images');
+                $product->update($request->all());
+            }
+
+            $product->update($request->all());
     
-            // Berhasil diperbarui, kirim respon JSON
-            return response()->json(['success' => true, 'msg' => 'Category updated successfully']);
+            return response()->json([
+                'status' => 'success', 
+                'message' => 'Product updated successfully',
+                'data' => $product
+            ]);
+
         } catch (\Exception $e) {
-            // Gagal diperbarui, kirim respon JSON dengan pesan kesalahan
-            return response()->json(['success' => false, 'msg' => $e->getMessage()]);
+            return response()->json([
+                'status' => 'failed', 
+                'message' => $e->getMessage()]);
         }
     }
 
