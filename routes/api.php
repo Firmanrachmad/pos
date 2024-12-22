@@ -30,4 +30,4 @@ Route::delete('delete-category/{id}', [CategoryController::class, 'destroy']);
 Route::get('product', [ProductController::class, 'index']);
 Route::post('add-product', [ProductController::class, 'store']);
 Route::put('edit-product/{id}', [ProductController::class, 'update']);
-// Route::delete('delete-category/{id}', [CategoryController::class, 'destroy']);
+Route::delete('delete-product/{id}', [ProductController::class, 'destroy']);

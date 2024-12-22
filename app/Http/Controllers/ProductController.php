@@ -4,30 +4,31 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
-use App\Models\Category;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
     public function index() {
         $product = Product::with('category')->get();
         return response()->json([
-            'status' => 'successs',
+            'status' => 'success',
             'data' => $product
         ]);
     }
 
     public function store(Request $request) {
-        
+
         $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'name' => 'required|max:255',
+            'category_id' => 'required|integer',
+            'name' => 'required|string|max:255',
             'price' => 'required|numeric',
             'desc' => 'required|max:255',
             'foto' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         try {
+
             $path = $request->file('foto')->store('public/images');
 
             $product = Product::create([
@@ -39,71 +40,98 @@ class ProductController extends Controller
             ]);
 
             return response()->json([
-                'status' => 'success', 
-                'message' => 'Product added successfully',
+                'status' => 'success',
                 'data' => $product
             ]);
-        } catch (\Exception $e) {
+
+        } catch(\Exception $e){
+
             return response()->json([
                 'status' => 'failed', 
-                'message' => $e->getMessage()]);
+                'message' => $e->getMessage()
+            ]);
+
         }
+        
     }
 
     public function update(Request $request, $id) {
         
-        $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'name' => 'required|max:255',
+         
+         $validator = Validator::make($request->all(), [
+            'category_id' => 'nullable|integer',
+            'name' => 'required|string|max:255',
             'price' => 'required|numeric',
-            'desc' => 'required|max:255',
-            'foto' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'desc' => 'required|string|max:255',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-    
-        try {
-            
-            $product = Product::find($id);
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
 
-            if(!$product){
-                return response()->json([
-                    'status' => 'failed',
-                    'message' => 'Product not found'
-                ]);
-            }
+        $product = Product::find($id);
 
+        if ($request->hasFile('foto')) {
 
-            if($request->foto){
-                $path = $request->file('foto')->store('public/images');
-                $product->update($request->all());
-            }
+            $image = $request->file('foto');
+            $image->storeAs('public/images', $image->hashName());
 
-            $product->update($request->all());
-    
+            Storage::delete('public/images/' . basename($product->foto));
+
+            $product->update([
+                'foto'     => $image->hashName(),
+                'category_id' => $request->category_id,
+                'name'   => $request->name,
+                'price'   => $request->price,
+                'desc'   => $request->desc,
+            ]);
+
             return response()->json([
-                'status' => 'success', 
-                'message' => 'Product updated successfully',
+                'status' => 'success',
                 'data' => $product
             ]);
 
-        } catch (\Exception $e) {
+        } else {
+
+            $product->update([
+                'category_id' => $request->category_id,
+                'name'   => $request->name,
+                'price'   => $request->price,
+                'desc'   => $request->desc,
+            ]);
+
             return response()->json([
-                'status' => 'failed', 
-                'message' => $e->getMessage()]);
+                'status' => 'success',
+                'data' => $product
+            ]);
         }
     }
 
     public function destroy($id) {
         try {
             $product = Product::find($id);
-            if ($product) {
-                $product->delete();
-                return response()->json(['success' => true, 'msg' => 'Product deleted successfully']);
-            } else {
-                return response()->json(['success' => false, 'msg' => 'Product not found']);
+
+            if(!$product){
+
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Product not found'
+                ]);
             }
+
+            $product->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Product deleted successfully'
+            ]);
+
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'msg' => $e->getMessage()]);
+            return response()->json([
+                'status' => 'failed', 
+                'message' => $e->getMessage()
+            ]);
         }
     }
 }

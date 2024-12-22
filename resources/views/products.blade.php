@@ -1,6 +1,8 @@
 @extends('layouts.template')
 @section('content')
+<!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
+   <!-- Content Header (Page header) -->
    <section class="content-header">
       <div class="container-fluid">
          <div class="row mb-2">
@@ -15,7 +17,9 @@
             </div>
          </div>
       </div>
+      <!-- /.container-fluid -->
    </section>
+   <!-- Main content -->
    <section class="content">
       <div class="container-fluid">
          <div class="row">
@@ -75,24 +79,23 @@
             <form id="productForm">
                <input type="hidden" id="productId">
                <div class="mb-3">
-                  <label for="productCategory">Category</label>
-                  <select class="form-control" id="productCategory" required>
-                  </select>
+                   <label for="productCategory" class="form-label">Category</label>
+                   <select class="form-control" id="productCategory" required></select>
                </div>
                <div class="form-group">
                   <label for="productName">Name</label>
                   <input type="text" class="form-control" id="productName" required>
                </div>
                <div class="mb-3">
-                   <label for="productPrice">Price</label>
-                   <input type="number" class="form-control" id="productPrice" required>
+                   <label for="productPrice" class="form-label">Price</label>
+                   <input type="number" inputmode="numeric" class="form-control" id="productPrice" required>
                </div>
                <div class="mb-3">
-                   <label for="productDesc">Description</label>
-                   <input type="text" class="form-control" id="productDesc" required>
+                   <label for="productDesc" class="form-label">Description</label>
+                   <input type="textarea" class="form-control" id="productDesc" required>
                </div>
                <div class="mb-3">
-                   <label for="productPhoto">Photo</label>
+                   <label for="productPhoto" class="form-label">Photo</label>
                    <input type="file" class="form-control" id="productPhoto" required>
                </div>
             </form>
@@ -117,7 +120,7 @@
     productCategory.innerHTML = data.data.map(cat => `
         <option value="${cat.id}">${cat.name}</option>
       `).join('');
-   }
+   }    
 
    async function fetchProduct(){
       const res = await fetch('api/product');
@@ -131,12 +134,8 @@
           <td>${prd.desc}</td>
           <td><img height="100" width="100" src="${prd.foto}" alt="${prd.name}"></td>
           <td>
-            <a class="btn btn-info btn-sm" onclick="showEditModal(${prd.id},  ${prd.category && prd.category.id ? prd.category.id : ''}, '${prd.name}', ${prd.price}, '${prd.desc}', '${prd.foto}')">
-                    <i class="fas fa-pencil-alt"></i>Edit
-                </a>
-                <a class="btn btn-danger btn-sm" onclick="deleteProduct(${prd.id})">
-                    <i class="fas fa-trash"></i>Delete
-                </a>
+            <a class="btn btn-info btn-sm" onclick="showEditModal(${prd.id},  ${prd.category && prd.category.id ? prd.category.id : ''}, '${prd.name}', ${prd.price}, '${prd.desc}')"><i class="fas fa-pencil-alt"></i>Edit</a>
+            <a class="btn btn-danger btn-sm" onclick="deleteProduct(${prd.id})"><i class="fas fa-trash"></i>Delete</a>
           </td>
         </tr>
       `).join('');
@@ -149,7 +148,7 @@
       document.getElementById('productId').value = ''
    }
 
-   function showEditModal(id, categoryId, name, price, desc, foto) {
+   function showEditModal(id, categoryId, name, price, desc) {
       $('#productModal').modal('show');
       document.getElementById('modalLabel').textContent = 'Edit Product'
       document.getElementById('productId').value = id
@@ -157,7 +156,6 @@
       document.getElementById('productName').value = name
       document.getElementById('productPrice').value = price
       document.getElementById('productDesc').value = desc
-      document.getElementById('productPhoto').value = foto
    }
 
    async function saveProduct(){
@@ -169,38 +167,32 @@
       const foto = document.getElementById('productPhoto').files[0]
 
       const formData = new FormData();
-         formData.append('name', name)
-         formData.append('price', price)
-         formData.append('desc', desc)
-         formData.append('category_id', category)
-         if (foto) {
-            formData.append('foto', foto)
-         }
+        formData.append('name', name)
+        formData.append('price', price)
+        formData.append('desc', desc)
+        formData.append('category_id', category)
+        if (foto) {
+        formData.append('foto', foto)
+        }
+      const method = id ? 'PUT' : 'POST'
+      const url = id ? `api/edit-product/${id}` : `api/add-product`
 
-         const method = id ? 'PUT' : 'POST'
-         const url = id ? `api/edit-product/${id}` : `api/add-product`
-
-         try {
-            const response = await fetch(url, {
-               method,
-               body: formData
-            });
-
-            $('#productModal').modal('hide');
-            fetchProduct();
-         } catch (error) {
-            console.error('Error saving product:', error);
-         }
+         await fetch(url, {
+            method,
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            },
+         })
 
       $('#productModal').modal('hide');
       fetchProduct()
    }
 
    async function deleteProduct(id) {
-      await fetch(`api/delete-product/${id}`, {method:'DELETE'})
+      await fetch(`api/delete-product/${id}`, { method : 'DELETE' })
       fetchProduct()
    }
-
    fetchCategories()
    fetchProduct()
 
