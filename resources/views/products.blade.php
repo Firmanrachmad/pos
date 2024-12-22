@@ -134,7 +134,7 @@
           <td>${prd.desc}</td>
           <td><img height="100" width="100" src="${prd.foto}" alt="${prd.name}"></td>
           <td>
-            <a class="btn btn-info btn-sm" onclick="showEditModal(${prd.id},  ${prd.category && prd.category.id ? prd.category.id : ''}, '${prd.name}', ${prd.price}, '${prd.desc}')"><i class="fas fa-pencil-alt"></i>Edit</a>
+            <a class="btn btn-info btn-sm" onclick="showEditModal(${prd.id},  ${prd.category && prd.category.id ? prd.category.id : null}, '${prd.name}', ${prd.price}, '${prd.desc}')"><i class="fas fa-pencil-alt"></i>Edit</a>
             <a class="btn btn-danger btn-sm" onclick="deleteProduct(${prd.id})"><i class="fas fa-trash"></i>Delete</a>
           </td>
         </tr>
@@ -152,7 +152,7 @@
       $('#productModal').modal('show');
       document.getElementById('modalLabel').textContent = 'Edit Product'
       document.getElementById('productId').value = id
-      document.getElementById('productCategory').value = categoryId || ''
+      document.getElementById('productCategory').value = categoryId ?? ''
       document.getElementById('productName').value = name
       document.getElementById('productPrice').value = price
       document.getElementById('productDesc').value = desc
@@ -166,23 +166,22 @@
       const desc = document.getElementById('productDesc').value
       const foto = document.getElementById('productPhoto').files[0]
 
-      const formData = new FormData();
-        formData.append('name', name)
-        formData.append('price', price)
-        formData.append('desc', desc)
-        formData.append('category_id', category)
-        if (foto) {
-        formData.append('foto', foto)
-        }
+      const formData = new FormData()
+      formData.append('name', name)
+      formData.append('price', price)
+      formData.append('desc', desc)
+      formData.append('category_id', category)
+      
+      if (foto) {
+         formData.append('foto', foto)
+      }
+
       const method = id ? 'PUT' : 'POST'
       const url = id ? `api/edit-product/${id}` : `api/add-product`
 
          await fetch(url, {
             method,
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            },
+            body: formData
          })
 
       $('#productModal').modal('hide');
