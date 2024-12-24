@@ -23,20 +23,20 @@ class ProductController extends Controller
             'category_id' => 'required|integer',
             'name' => 'required|string|max:255',
             'price' => 'required|numeric',
-            'desc' => 'required|max:255',
-            'foto' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'description' => 'required|max:255',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         try {
 
-            $path = $request->file('foto')->store('public/images');
+            $path = $request->file('image')->store('public/images');
 
             $product = Product::create([
                 'category_id' => $request->category_id,
                 'name' => $request->name,
                 'price' => $request->price,
-                'desc' => $request->desc,
-                'foto' => Storage::url($path),
+                'description' => $request->description,
+                'image' => Storage::url($path),
             ]);
 
             return response()->json([
@@ -56,57 +56,60 @@ class ProductController extends Controller
     }
 
     public function update(Request $request, $id) {
-        
-         
-         $validator = Validator::make($request->all(), [
-            'category_id' => 'nullable|integer',
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric',
-            'desc' => 'required|string|max:255',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        // dd($request->all());
+        // return response()->json([
+        //     'all_data' => $request->all(),
+        //     'file_data' => $request->file('image'),
+        // ]);
+        $validator = Validator::make($request->all(), [
+            'category_id' => 'required',
+            'name' => 'required',
+            'price' => 'required',
+            'description' => 'required',
         ]);
-
+    
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
-
+    
         $product = Product::find($id);
 
-        if ($request->hasFile('foto')) {
+        if (!$product) {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
+    
+        if ($request->hasFile('image')) {
 
-            $image = $request->file('foto');
-            $image->storeAs('public/images', $image->hashName());
+            $image = $request->file('image');
+            $path = $image->store('public/images');
 
-            Storage::delete('public/images/' . basename($product->foto));
+            Storage::delete('public/images/' . basename($product->image));
 
             $product->update([
-                'foto'     => $image->hashName(),
-                'category_id' => $request->category_id,
-                'name'   => $request->name,
-                'price'   => $request->price,
-                'desc'   => $request->desc,
-            ]);
-
-            return response()->json([
-                'status' => 'success',
-                'data' => $product
+                'image'           => Storage::url($path),
+                'category_id'     => $request->category_id,
+                'name'            => $request->name,
+                'price'           => $request->price,
+                'description'     => $request->description,
             ]);
 
         } else {
 
             $product->update([
-                'category_id' => $request->category_id,
+                'category_id'     => $request->category_id,
                 'name'   => $request->name,
                 'price'   => $request->price,
-                'desc'   => $request->desc,
+                'description'   => $request->description,
             ]);
 
-            return response()->json([
-                'status' => 'success',
-                'data' => $product
-            ]);
         }
+    
+        return response()->json([
+            'status' => 'success',
+            'data' => $product
+        ]);
     }
+    
 
     public function destroy($id) {
         try {

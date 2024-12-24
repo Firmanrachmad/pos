@@ -76,7 +76,7 @@
             </button>
          </div>
          <div class="modal-body">
-            <form id="productForm">
+            <form id="productForm" enctype="application/json">
                <input type="hidden" id="productId">
                <div class="mb-3">
                    <label for="productCategory" class="form-label">Category</label>
@@ -91,12 +91,12 @@
                    <input type="number" inputmode="numeric" class="form-control" id="productPrice" required>
                </div>
                <div class="mb-3">
-                   <label for="productDesc" class="form-label">Description</label>
-                   <input type="textarea" class="form-control" id="productDesc" required>
+                   <label for="productDescription" class="form-label">Description</label>
+                   <textarea class="form-control" id="productDescription" required></textarea>
                </div>
                <div class="mb-3">
-                   <label for="productPhoto" class="form-label">Photo</label>
-                   <input type="file" class="form-control" id="productPhoto" required>
+                   <label for="productImage" class="form-label">Image</label>
+                   <input type="file" class="form-control" id="productImage" required>
                </div>
             </form>
          </div>
@@ -125,16 +125,16 @@
    async function fetchProduct(){
       const res = await fetch('api/product');
       const data = await res.json();
-      productTable.innerHTML = data.data.map(prd => `
+      productTable.innerHTML = data.data.map((prd, index) => `
         <tr>
-          <td>${prd.id}</td>
+          <td>${index + 1}</td>
           <td>${prd.category && prd.category.name ? prd.category.name : 'Kategori Tidak Tersedia'}</td>
           <td>${prd.name}</td>
           <td>${prd.price}</td>
-          <td>${prd.desc}</td>
-          <td><img height="100" width="100" src="${prd.foto}" alt="${prd.name}"></td>
+          <td>${prd.description}</td>
+          <td><img height="100" width="100" src="${prd.image}" alt="${prd.name}"></td>
           <td>
-            <a class="btn btn-info btn-sm" onclick="showEditModal(${prd.id},  ${prd.category && prd.category.id ? prd.category.id : null}, '${prd.name}', ${prd.price}, '${prd.desc}')"><i class="fas fa-pencil-alt"></i>Edit</a>
+            <a class="btn btn-info btn-sm" onclick="showEditModal(${prd.id},  ${prd.category && prd.category.id ? prd.category.id : null}, '${prd.name}', ${prd.price}, '${prd.description}', '${prd.image}')"><i class="fas fa-pencil-alt"></i>Edit</a>
             <a class="btn btn-danger btn-sm" onclick="deleteProduct(${prd.id})"><i class="fas fa-trash"></i>Delete</a>
           </td>
         </tr>
@@ -148,14 +148,14 @@
       document.getElementById('productId').value = ''
    }
 
-   function showEditModal(id, categoryId, name, price, desc) {
+   function showEditModal(id, categoryId, name, price, description) {
       $('#productModal').modal('show');
       document.getElementById('modalLabel').textContent = 'Edit Product'
       document.getElementById('productId').value = id
       document.getElementById('productCategory').value = categoryId ?? ''
       document.getElementById('productName').value = name
       document.getElementById('productPrice').value = price
-      document.getElementById('productDesc').value = desc
+      document.getElementById('productDescription').value = description
    }
 
    async function saveProduct(){
@@ -163,26 +163,57 @@
       const category = document.getElementById('productCategory').value
       const name = document.getElementById('productName').value
       const price = document.getElementById('productPrice').value
-      const desc = document.getElementById('productDesc').value
-      const foto = document.getElementById('productPhoto').files[0]
+      const description = document.getElementById('productDescription').value
+      const image = document.getElementById('productImage').files[0]
 
-      const formData = new FormData()
+      const formData = new FormData();
+      formData.append('category_id', category)
       formData.append('name', name)
       formData.append('price', price)
-      formData.append('desc', desc)
-      formData.append('category_id', category)
-      
-      if (foto) {
-         formData.append('foto', foto)
+      formData.append('description', description)
+      if (image) {
+         formData.append('image', image)
       }
 
-      const method = id ? 'PUT' : 'POST'
+      if (id) {
+        formData.append('_method', 'PUT')
+    }
+
+      console.log([...formData.entries()])
+
+      // const payload = { id, category, name, price, desc, image }
+
+      // const method = id ? 'PUT' : 'POST'
       const url = id ? `api/edit-product/${id}` : `api/add-product`
 
-         await fetch(url, {
-            method,
-            body: formData
-         })
+      // await fetch(url, {
+      //    method,
+         // headers: { 'Content-Type' : 'application/json'},
+         // body: JSON.stringify(payload)
+      //    body: formData,
+      // })
+
+      try {
+
+         const response = await fetch(url, {
+               // method,
+               method: 'POST',
+               body: formData,
+         });
+
+         if (!response.ok) {
+               const errorData = await response.json();
+               console.error('Validation Error:', errorData);
+               alert(`Error: ${JSON.stringify(errorData)}`);
+               return;
+         }
+
+         $('#productModal').modal('hide');
+         fetchProduct();
+      } catch (error) {
+         console.error('Unexpected Error:', error);
+         alert('An unexpected error occurred.');
+      }
 
       $('#productModal').modal('hide');
       fetchProduct()

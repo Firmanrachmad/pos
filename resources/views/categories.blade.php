@@ -92,9 +92,9 @@
    async function fetchCategory(){
       const res = await fetch('api/category');
       const data = await res.json();
-      categoryTable.innerHTML = data.data.map(ctg => `
+      categoryTable.innerHTML = data.data.map((ctg, index) => `
         <tr>
-          <td>${ctg.id}</td>
+          <td>${index + 1}</td>
           <td>${ctg.name}</td>
           <td>
             <a class="btn btn-info btn-sm" onclick="showEditModal(${ctg.id}, '${ctg.name}')"><i class="fas fa-pencil-alt"></i>Edit</a>
