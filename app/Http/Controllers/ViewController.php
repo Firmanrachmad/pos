@@ -13,4 +13,8 @@ class ViewController extends Controller
     public function product(){
         return view('products');
     }
+
+    public function pos(){
+        return view('pos');
+    }
 }

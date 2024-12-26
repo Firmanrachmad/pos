@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\TransactionDetailController;
+use App\Http\Controllers\TransactionsController;
+use App\Models\TransactionDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -31,3 +34,7 @@ Route::get('product', [ProductController::class, 'index']);
 Route::post('add-product', [ProductController::class, 'store']);
 Route::put('edit-product/{id}', [ProductController::class, 'update']);
 Route::delete('delete-product/{id}', [ProductController::class, 'destroy']);
+
+// Transactions
+Route::post('checkout', [TransactionsController::class, 'checkout']);
+Route::get('show-detail/{id}', [TransactionDetailController::class, 'show']);

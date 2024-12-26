@@ -125,20 +125,29 @@
    async function fetchProduct(){
       const res = await fetch('api/product');
       const data = await res.json();
-      productTable.innerHTML = data.data.map((prd, index) => `
+      productTable.innerHTML = data.data.map((prd, index) => {
+      const formattedPrice = new Intl.NumberFormat('id-ID', {
+         style: 'currency',
+         currency: 'IDR',
+         minimumFractionDigits: 2,
+         maximumFractionDigits: 2
+      }).format(prd.price);
+
+      return `
         <tr>
           <td>${index + 1}</td>
           <td>${prd.category && prd.category.name ? prd.category.name : 'Kategori Tidak Tersedia'}</td>
           <td>${prd.name}</td>
-          <td>${prd.price}</td>
+          <td>${formattedPrice}</td>
           <td>${prd.description}</td>
           <td><img height="100" width="100" src="${prd.image}" alt="${prd.name}"></td>
           <td>
-            <a class="btn btn-info btn-sm" onclick="showEditModal(${prd.id},  ${prd.category && prd.category.id ? prd.category.id : null}, '${prd.name}', ${prd.price}, '${prd.description}', '${prd.image}')"><i class="fas fa-pencil-alt"></i>Edit</a>
+            <a class="btn btn-info btn-sm" onclick="showEditModal(${prd.id}, ${prd.category && prd.category.id ? prd.category.id : null}, '${prd.name}', ${prd.price}, '${prd.description}', '${prd.image}')"><i class="fas fa-pencil-alt"></i>Edit</a>
             <a class="btn btn-danger btn-sm" onclick="deleteProduct(${prd.id})"><i class="fas fa-trash"></i>Delete</a>
           </td>
         </tr>
-      `).join('');
+      `;
+      }).join('');
    }
 
    function showAddModal(){
@@ -177,26 +186,13 @@
 
       if (id) {
         formData.append('_method', 'PUT')
-    }
+      }
 
-      console.log([...formData.entries()])
-
-      // const payload = { id, category, name, price, desc, image }
-
-      // const method = id ? 'PUT' : 'POST'
       const url = id ? `api/edit-product/${id}` : `api/add-product`
-
-      // await fetch(url, {
-      //    method,
-         // headers: { 'Content-Type' : 'application/json'},
-         // body: JSON.stringify(payload)
-      //    body: formData,
-      // })
 
       try {
 
          const response = await fetch(url, {
-               // method,
                method: 'POST',
                body: formData,
          });
@@ -220,8 +216,44 @@
    }
 
    async function deleteProduct(id) {
-      await fetch(`api/delete-product/${id}`, { method : 'DELETE' })
-      fetchProduct()
+      const result = await Swal.fire({
+         title: 'Are you sure?',
+         text: "This action cannot be undone.",
+         icon: 'warning',
+         showCancelButton: true,
+         confirmButtonText: 'Yes, delete it!',
+         cancelButtonText: 'Cancel',
+         reverseButtons: true
+      });
+
+      if (result.isConfirmed) {
+         try {
+            const res = await fetch(`api/delete-product/${id}`, { method: 'DELETE' });
+
+            if (res.ok) {
+               Swal.fire(
+                  'Deleted!',
+                  'Your product has been deleted.',
+                  'success'
+               );
+               fetchProduct();
+            } else {
+               const errorData = await res.json();
+               Swal.fire(
+                  'Error!',
+                  `Failed to delete product: ${JSON.stringify(errorData)}`,
+                  'error'
+               );
+            }
+         } catch (error) {
+            console.error('Unexpected Error:', error);
+            Swal.fire(
+               'Error!',
+               'An unexpected error occurred.',
+               'error'
+            );
+         }
+      }
    }
    fetchCategories()
    fetchProduct()

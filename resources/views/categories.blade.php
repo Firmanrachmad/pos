@@ -137,8 +137,44 @@
    }
 
    async function deleteCategory(id) {
-      await fetch(`api/delete-category/${id}`, {method:'DELETE'})
-      fetchCategory()
+      const result = await Swal.fire({
+         title: 'Are you sure?',
+         text: "This action cannot be undone.",
+         icon: 'warning',
+         showCancelButton: true,
+         confirmButtonText: 'Yes, delete it!',
+         cancelButtonText: 'Cancel',
+         reverseButtons: true
+      });
+
+      if (result.isConfirmed) {
+         try {
+            const res = await fetch(`api/delete-category/${id}`, { method: 'DELETE' });
+
+            if (res.ok) {
+               Swal.fire(
+                  'Deleted!',
+                  'Your category has been deleted.',
+                  'success'
+               );
+               fetchCategory();
+            } else {
+               const errorData = await res.json();
+               Swal.fire(
+                  'Error!',
+                  `Failed to delete category: ${JSON.stringify(errorData)}`,
+                  'error'
+               );
+            }
+         } catch (error) {
+            console.error('Unexpected Error:', error);
+            Swal.fire(
+               'Error!',
+               'An unexpected error occurred.',
+               'error'
+            );
+         }
+      }
    }
 
    fetchCategory()

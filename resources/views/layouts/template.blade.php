@@ -134,7 +134,7 @@
                      </a>
                   </li>
                   <li class="nav-item">
-                     <a href="pages/widgets.html" class="nav-link">
+                     <a href="/pos" class="nav-link {{ Request::is('pos') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-shopping-cart"></i>
                         <p>
                            POS System
@@ -260,7 +260,7 @@
          $(function () {
             
             $("#example1").DataTable({
-               "responsive": true, "lengthChange": false, "autoWidth": false,
+               "responsive": true, "lengthChange": true, "autoWidth": true,
                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
             $('#example2').DataTable({
