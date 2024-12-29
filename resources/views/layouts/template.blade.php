@@ -141,12 +141,20 @@
                         </p>
                      </a>
                   </li>
+                  <li class="nav-item">
+                     <a href="/report" class="nav-link {{ Request::is('report') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-file-alt"></i>
+                        <p>
+                           Reporting
+                        </p>
+                     </a>
+                  </li>
                   <li class="nav-header">Data Master</li>
                   <li class="nav-item">
-                     <a href="/orders" class="nav-link {{ Request::is('orders') ? 'active' : '' }}">
+                     <a href="/transactions" class="nav-link {{ Request::is('transactions') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-list"></i>
                         <p>
-                           Orders
+                           Transactions
                         </p>
                      </a>
                   </li>
@@ -172,6 +180,14 @@
                         <i class="nav-icon fas fa-user-circle"></i>
                         <p>
                            User Settings
+                        </p>
+                     </a>
+                  </li>
+                  <li class="nav-item">
+                     <a href="pages/widgets.html" class="nav-link">
+                        <i class="nav-icon fas fa-wrench"></i>
+                        <p>
+                           Preferences
                         </p>
                      </a>
                   </li>
@@ -259,6 +275,7 @@
       <script>
          $(function () {
             
+            
             $("#example1").DataTable({
                "responsive": true, "lengthChange": true, "autoWidth": true,
                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
@@ -266,12 +283,13 @@
             $('#example2').DataTable({
                "paging": true,
                "lengthChange": false,
-               "searching": false,
+               "searching": true,
                "ordering": true,
                "info": true,
                "autoWidth": false,
                "responsive": true,
             });
+            
          });
       </script>
    </body>

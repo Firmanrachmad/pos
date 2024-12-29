@@ -38,3 +38,4 @@ Route::delete('delete-product/{id}', [ProductController::class, 'destroy']);
 // Transactions
 Route::post('checkout', [TransactionsController::class, 'checkout']);
 Route::get('show-detail/{id}', [TransactionDetailController::class, 'show']);
+Route::get('transaction', [TransactionDetailController::class, 'index']);

@@ -142,8 +142,10 @@
           <td>${prd.description}</td>
           <td><img height="100" width="100" src="${prd.image}" alt="${prd.name}"></td>
           <td>
-            <a class="btn btn-info btn-sm" onclick="showEditModal(${prd.id}, ${prd.category && prd.category.id ? prd.category.id : null}, '${prd.name}', ${prd.price}, '${prd.description}', '${prd.image}')"><i class="fas fa-pencil-alt"></i>Edit</a>
-            <a class="btn btn-danger btn-sm" onclick="deleteProduct(${prd.id})"><i class="fas fa-trash"></i>Delete</a>
+            <a class="btn btn-info btn-sm" onclick="showEditModal(${prd.id}, ${prd.category && prd.category.id ? prd.category.id : null}, '${prd.name}', ${prd.price}, '${prd.description}', '${prd.image}')"><i class="fas fa-pencil-alt"></i> 
+               Edit</a>
+            <a class="btn btn-danger btn-sm" onclick="deleteProduct(${prd.id})"><i class="fas fa-trash"></i> 
+               Delete</a>
           </td>
         </tr>
       `;

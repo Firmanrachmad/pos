@@ -8,6 +8,15 @@ use Illuminate\Http\Request;
 
 class TransactionDetailController extends Controller
 {
+    public function index(){
+        
+        $transaction = Transactions::orderBy('transaction_date', 'desc')->get();
+        return response()->json([
+            'status' => 'success',
+            'data' => $transaction
+        ]);
+    }
+
     public function show($id){
 
         $transaction = Transactions::with('transactionDetails')->find($id);

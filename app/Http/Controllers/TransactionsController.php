@@ -17,15 +17,16 @@ class TransactionsController extends Controller
 
         $validated = $request->validate([
             'transaction_date' => 'required|date',
-            'payment_method' => 'required|string',
+            'payment_method' => 'nullable|string',
+            'payment_status' => 'nullable|string',
             'cart' => 'required|array',
-            'cart.*.product_id' => 'required|exists:products,id',
+            'cart.*.product_name' => 'required|string',
             'cart.*.quantity' => 'required|integer|min:1',
             'cart.*.price' => 'required|numeric|min:0',
             'cart.*.subtotal' => 'required|numeric|min:0',
             'total_price' => 'required|numeric|min:0',
             'payment' => 'required|numeric|min:0',
-            'change' => 'required|numeric|min:0',
+            'change' => 'required|numeric',
             'note' => 'nullable|string',
         ]);
 
@@ -36,7 +37,7 @@ class TransactionsController extends Controller
             $transaction = Transactions::create([
                 'transaction_date' => $validated['transaction_date'],
                 'total_amount' => $validated['total_price'],
-                'payment_status' => 'pending',
+                'payment_status' => $validated['payment_status'],
                 'payment_method' => $validated['payment_method'],
                 'payment' => $validated['payment'],
                 'change' => $validated['change'],
@@ -46,7 +47,7 @@ class TransactionsController extends Controller
             foreach ($validated['cart'] as $item) {
                 TransactionDetail::create([
                     'transaction_id' => $transaction->id,
-                    'product_id' => $item['product_id'],
+                    'product_name' => $item['product_name'],
                     'quantity' => $item['quantity'],
                     'price' => $item['price'],
                     'subtotal' => $item['subtotal'],

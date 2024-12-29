@@ -17,4 +17,8 @@ class ViewController extends Controller
     public function pos(){
         return view('pos');
     }
+
+    public function transaction(){
+        return view('transactions');
+    }
 }

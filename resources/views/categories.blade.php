@@ -97,8 +97,10 @@
           <td>${index + 1}</td>
           <td>${ctg.name}</td>
           <td>
-            <a class="btn btn-info btn-sm" onclick="showEditModal(${ctg.id}, '${ctg.name}')"><i class="fas fa-pencil-alt"></i>Edit</a>
-            <a class="btn btn-danger btn-sm" onclick="deleteCategory(${ctg.id})"><i class="fas fa-trash"></i>Delete</a>
+            <a class="btn btn-info btn-sm" onclick="showEditModal(${ctg.id}, '${ctg.name}')"><i class="fas fa-pencil-alt"></i> 
+               Edit</a>
+            <a class="btn btn-danger btn-sm" onclick="deleteCategory(${ctg.id})"><i class="fas fa-trash"></i> 
+               Delete</a>
           </td>
         </tr>
       `).join('');

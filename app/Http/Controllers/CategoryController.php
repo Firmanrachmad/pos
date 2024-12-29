@@ -8,7 +8,7 @@ use App\Models\Category;
 class CategoryController extends Controller
 {
     public function index() {
-        $category = Category::all();
+        $category = Category::orderBy('name', 'asc')->get();
         return response()->json([
             'status' => 'success',
             'data' => $category
