@@ -15,13 +15,12 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->dateTime('transaction_date')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->dateTime('due_date')->nullable();
             $table->decimal('total_amount', 15, 2);
             $table->string('payment_status', 20)->default('unpaid');
-            $table->string('payment_method', 50)->nullable();
-            $table->decimal('payment');
-            $table->decimal('change');
-            $table->string('note')->nullable();
             $table->timestamps();
+
+            $table->softDeletes();
         });
     }
 

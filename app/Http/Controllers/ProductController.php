@@ -10,10 +10,17 @@ use Illuminate\Support\Facades\Validator;
 class ProductController extends Controller
 {
     public function index() {
-        $product = Product::with('category')->get();
+        $products = Product::with('category')
+            ->get()
+            ->sortBy(function ($product) {
+                return $product->category ? $product->category->name : null;
+            })
+            ->values()
+            ->all();
+        
         return response()->json([
             'status' => 'success',
-            'data' => $product
+            'data' => $products
         ]);
     }
 

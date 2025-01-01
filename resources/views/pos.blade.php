@@ -241,6 +241,12 @@
                         <input type="number" id="paymentAmount" class="form-control" placeholder="Enter payment">
                       </td>
                     </tr>
+                    <tr id="dueDateRow" style="display: none;">
+                      <th>Due Date:</th>
+                      <td>
+                        <input type="date" id="dueDate" class="form-control">
+                      </td>
+                    </tr>
                     <tr>
                       <th>Change:</th>
                       <td id="changeAmount"></td>
@@ -399,6 +405,7 @@
     const paymentInput = document.getElementById('paymentAmount')
     const changeAmountElement = document.getElementById('changeAmount')
     const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]')
+    const dueDateRow = document.getElementById('dueDateRow')
     let currentPayNowOption = 'paid'
 
     checkoutCartTable.innerHTML = cart.map(item => `
@@ -443,6 +450,7 @@
             if (paymentInput.value > totalAmount) {
               paymentInput.dispatchEvent(new Event('input'))
             }
+            dueDateRow.style.display = 'none'
           } else if (event.target.value === 'unpaid') {
             paymentMethods.forEach(method => {
               method.checked = false
@@ -452,12 +460,13 @@
             paymentInput.value = 0
             const change = 0 - totalAmount
             changeAmountElement.textContent = formatCurrency(change)
+            dueDateRow.style.display = 'table-row'
           } else if (event.target.value === 'pending') {
             document.getElementById('paymentCash').checked = true
-            paymentMethods.forEach(method => method.disabled = false);
-            paymentInput.disabled = false;
-
-            paymentInput.dispatchEvent(new Event('input'));
+            paymentMethods.forEach(method => method.disabled = false)
+            paymentInput.disabled = false
+            dueDateRow.style.display = 'table-row'
+            paymentInput.dispatchEvent(new Event('input'))
           }
         }
       })
@@ -474,16 +483,18 @@
     })
 
     $('#checkoutModal').on('hidden.bs.modal', function () {
-        document.getElementById('payNowYes').checked = true;
-        document.getElementById('paymentCash').checked = true;
+        document.getElementById('payNowYes').checked = true
+        document.getElementById('paymentCash').checked = true
         paymentMethods.forEach(method => {
            method.checked = false;
            method.disabled = false;
-        });
-        paymentInput.value = '';
-        paymentInput.disabled = false;
-        changeAmountElement.textContent = formatCurrency(0);
-        currentPayNowOption = 'paid';
+        })
+        paymentInput.value = ''
+        paymentInput.disabled = false
+        changeAmountElement.textContent = formatCurrency(0)
+        currentPayNowOption = 'paid'
+        dueDateRow.style.display = 'none'
+        document.getElementById('dueDate').value = ''
      });
 
     $('#checkoutModal').modal('show')
@@ -494,7 +505,7 @@
     const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || null
     const paymentAmount = parseFloat(document.getElementById('paymentAmount').value) || 0
     const totalPrice = cart.reduce((total, item) => total + item.subtotal, 0)
-    let changeAmount = 0
+    let dueDate = document.getElementById('dueDate')?.value || null
 
     if (payNowOption === 'paid') {
       if(paymentAmount < totalPrice){
@@ -504,9 +515,14 @@
         })
           return
       }
-      changeAmount = Math.max(0, paymentAmount - totalPrice)
     } else if (payNowOption === 'unpaid') {
-        changeAmount =  totalPrice * -1
+        if (!dueDate) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Please enter due date if payment is not fully paid.'
+        })
+        return
+        }
     } else if (payNowOption === 'pending') {
       if(paymentAmount === 0){
         Swal.fire({
@@ -520,9 +536,15 @@
           title: 'Please change to yes option if you want to pay in full'
         })
           return
-
       }
-        changeAmount = paymentAmount - totalPrice;
+
+      if (!dueDate) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Please enter due date if payment is not fully paid.'
+        })
+        return
+      }
     }
 
     const now = new Date()
@@ -541,14 +563,11 @@
         payment_status: payNowOption,
         payment_method: payNowOption === 'no' ? null : paymentMethod,
         cart: cart.map(item => ({
-            product_name: item.name,
-            quantity: item.quantity,
-            price: item.price,
-            subtotal: item.subtotal
+            product_id: item.id,
+            quantity: item.quantity
         })),
-        total_price: totalPrice,
         payment: paymentAmount,
-        change: changeAmount,
+        due_date: dueDate,
         note: document.getElementById('paymentNotes')?.value || ''
     }
 

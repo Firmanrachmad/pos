@@ -37,10 +37,6 @@
                               <th>Transaction Date</th>
                               <th>Total Amount</th>
                               <th>Payment Status</th>
-                              <th>Payment Method</th>
-                              <th>Payment</th>
-                              <th>Change</th>
-                              <th>Notes</th>
                               <th>Action</th>
                            </tr>
                         </thead>
@@ -51,10 +47,6 @@
                               <th>Transaction Date</th>
                               <th>Total Amount</th>
                               <th>Payment Status</th>
-                              <th>Payment Method</th>
-                              <th>Payment</th>
-                              <th>Change</th>
-                              <th>Notes</th>
                               <th>Action</th>
                            </tr>
                         </tfoot>
@@ -79,8 +71,8 @@
    const transacionTable = document.getElementById('transactionTable')
 
    async function fetchTransaction() {
-      const res = await fetch('api/transaction');
-      const data = await res.json();
+      const res = await fetch('api/transaction')
+      const data = await res.json()
       transactionTable.innerHTML = data.data.map((trs, index) => {
          const paymentStatus = getPaymentStatusBadge(trs.payment_status);
 
@@ -90,10 +82,6 @@
                <td>${trs.transaction_date}</td>
                <td>${formatCurrency(trs.total_amount)}</td>
                <td>${paymentStatus}</td>
-               <td>${trs.payment_method || '-'}</td>
-               <td>${formatCurrency(trs.payment)}</td>
-               <td>${formatCurrency(trs.change)}</td>
-               <td>${trs.note || '-'}</td>
                <td>
                   <button class="btn btn-primary btn-sm" onclick="viewTransaction(${trs.id})">
                      <i class="fas fa-eye"></i>
@@ -107,13 +95,11 @@
    function getPaymentStatusBadge(status) {
       switch (status) {
          case 'paid':
-            return `<span class="badge badge-success"><i class="fas fa-check-circle"></i> Paid</span>`;
+            return `<span class="badge badge-success"><i class="fas fa-check-circle"></i> PAID</span>`;
          case 'unpaid':
-            return `<span class="badge badge-danger"><i class="fas fa-times-circle"></i> Unpaid</span>`;
+            return `<span class="badge badge-danger"><i class="fas fa-times-circle"></i> UNPAID</span>`;
          case 'pending':
-            return `<span class="badge badge-warning"><i class="fas fa-clock"></i> Pending</span>`;
-         default:
-            return `<span class="badge badge-secondary"><i class="fas fa-question-circle"></i> Unknown</span>`;
+            return `<span class="badge badge-warning"><i class="fas fa-clock"></i> PENDING</span>`;
       }
    }
 
