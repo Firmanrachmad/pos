@@ -16,10 +16,35 @@ class Transactions extends Model
 
     protected $fillable = [
         'transaction_date',
+        'transaction_number',
         'due_date',
         'total_amount',
-        'payment_status'
+        'payment_status',
+        'customer_id'
     ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($transaction) {
+            $transaction->transaction_number = self::generateTransactionNumber();
+        });
+    }
+
+    private static function generateTransactionNumber()
+    {
+        $year = date('Y');
+        $month = date('m');
+        $lastTransaction = self::whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->latest('id')
+            ->first();
+        $nextId = $lastTransaction ? $lastTransaction->id + 1 : 1;
+
+        $minLength = 5;
+        return "TRX{$year}{$month}" . str_pad($nextId, $minLength, '0', STR_PAD_LEFT);
+    }
 
     public function transactionDetails(){
         return $this->hasMany(TransactionDetail::class, 'transaction_id');
@@ -29,8 +54,8 @@ class Transactions extends Model
         return $this->hasMany(Payment::class, 'transaction_id');
     }
 
-    public function transactionStatusHistories(){
-        return $this->hasMany(TransactionStatusHistory::class, 'transaction_id');
+    public function customer(){
+        return $this->belongsTo(Customer::class, 'customer_id');
     }
     
 }

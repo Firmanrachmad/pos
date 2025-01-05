@@ -11,6 +11,7 @@ class ProductController extends Controller
 {
     public function index() {
         $products = Product::with('category')
+            ->withTrashed()
             ->get()
             ->sortBy(function ($product) {
                 return $product->category ? $product->category->name : null;

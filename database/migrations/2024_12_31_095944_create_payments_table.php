@@ -19,7 +19,8 @@ return new class extends Migration
             $table->string('payment_method', 50)->nullable();
             $table->decimal('payment', 15, 2);
             $table->decimal('change', 15, 2);
-            $table->string('note')->nullable();
+            $table->text('note')->nullable();
+            $table->string('status', 50)->nullable();
             $table->timestamps();
 
             $table->foreign('transaction_id')->references('id')->on('transactions')->onDelete('cascade');

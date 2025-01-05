@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 
 class ViewController extends Controller
 {
+    public function customer(){
+        return view('customers');
+    }
+    
     public function category(){
         return view('categories');
     }

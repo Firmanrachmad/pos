@@ -34,7 +34,8 @@
                         <thead>
                            <tr>
                               <th>#</th>
-                              <th>Transaction Date</th>
+                              <th>Transaction Number</th>
+                              <th>Customer Name</th>
                               <th>Total Amount</th>
                               <th>Payment Status</th>
                               <th>Action</th>
@@ -44,7 +45,8 @@
                         <tfoot>
                            <tr>
                               <th>#</th>
-                              <th>Transaction Date</th>
+                              <th>Transaction Number</th>
+                              <th>Customer Name</th>
                               <th>Total Amount</th>
                               <th>Payment Status</th>
                               <th>Action</th>
@@ -79,7 +81,8 @@
          return `
             <tr>
                <td>${index + 1}</td>
-               <td>${trs.transaction_date}</td>
+               <td>${trs.transaction_number}</td>
+               <td>${trs.customer && trs.customer.name ? trs.customer.name : '-'}</td>
                <td>${formatCurrency(trs.total_amount)}</td>
                <td>${paymentStatus}</td>
                <td>

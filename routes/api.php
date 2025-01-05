@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TransactionDetailController;
 use App\Http\Controllers\TransactionsController;
@@ -34,6 +35,12 @@ Route::get('product', [ProductController::class, 'index']);
 Route::post('add-product', [ProductController::class, 'store']);
 Route::put('edit-product/{id}', [ProductController::class, 'update']);
 Route::delete('delete-product/{id}', [ProductController::class, 'destroy']);
+
+// Customer
+Route::get('customer', [CustomerController::class, 'index']);
+Route::post('add-customer', [CustomerController::class, 'store']);
+Route::put('edit-customer/{id}', [CustomerController::class, 'update']);
+Route::delete('delete-customer/{id}', [CustomerController::class, 'destroy']);
 
 // Transactions
 Route::post('checkout', [TransactionsController::class, 'checkout']);

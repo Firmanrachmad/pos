@@ -150,13 +150,28 @@
                      </a>
                   </li>
                   <li class="nav-header">Data Master</li>
-                  <li class="nav-item">
-                     <a href="/transactions" class="nav-link {{ Request::is('transactions') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-list"></i>
+                  <li class="nav-item {{ Request::is('transactions*') || Request::is('payments*') ? 'menu-open' : '' }}">
+                     <a href="#" class="nav-link {{ Request::is('transactions*') || Request::is('payments*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-exchange-alt"></i>
                         <p>
                            Transactions
+                           <i class="right fas fa-angle-left"></i>
                         </p>
                      </a>
+                     <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                          <a href="/transactions" class="nav-link {{ Request::is('transactions') ? 'active' : '' }}">
+                            <i class="fas fa-list nav-icon"></i>
+                            <p>Transactions List</p>
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a href="/payments" class="nav-link {{ Request::is('payments') ? 'active' : '' }}">
+                            <i class="far fa-credit-card nav-icon"></i>
+                            <p>Payments History</p>
+                          </a>
+                        </li>
+                      </ul>
                   </li>
                   <li class="nav-item">
                      <a href="/products" class="nav-link {{ Request::is('products') ? 'active' : '' }}">
@@ -171,6 +186,14 @@
                         <i class="nav-icon fas fa-tag"></i>
                         <p>
                            Categories
+                        </p>
+                     </a>
+                  </li>
+                  <li class="nav-item">
+                     <a href="/customers" class="nav-link {{ Request::is('customers') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-users"></i>
+                        <p>
+                           Customers
                         </p>
                      </a>
                   </li>

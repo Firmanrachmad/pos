@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('transaction_details', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('transaction_id');
-            $table->unsignedBigInteger('product_id')->nullable();
+            $table->unsignedBigInteger('product_id');
+            $table->decimal('price', 15, 2);
             $table->integer('quantity');
             $table->decimal('subtotal', 15, 2);
             $table->timestamps();

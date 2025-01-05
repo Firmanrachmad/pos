@@ -6,22 +6,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class TransactionStatusHistory extends Model
+class Customer extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'transaction_status_histories';
+    protected $table = 'customers';
 
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'transaction_id',
-        'status_date',
-        'status'
+        'name',
     ];
 
-    public function transaction(){
-        return $this->belongsTo(Transactions::class, 'transaction_id');
+    public function transactions(){
+        return $this->hasMany(Transactions::class, 'customer_id');
     }
-
 }

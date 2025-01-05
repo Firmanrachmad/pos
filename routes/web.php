@@ -18,6 +18,7 @@ Route::get('/', function () {
     return view('dashboard');
 });
 
+Route::get('customers', [ViewController::class, 'customer']);
 Route::get('categories', [ViewController::class, 'category']);
 Route::get('products', [ViewController::class, 'product']);
 Route::get('pos', [ViewController::class, 'pos']);

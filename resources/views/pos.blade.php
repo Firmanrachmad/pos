@@ -170,7 +170,14 @@
                 <br>
                 <b>Order ID:</b> 4F3S8J<br>
                 <b>Payment Due:</b> 2/22/2014<br>
-                <b>Account:</b> 968-34567
+                <b>Customer:</b> 
+                <div style="display: inline-flex; align-items: center; margin-left: 10px;">
+                  <select class="form-control" id="customerSelect" style="width: 150px; height: 35px;" required>
+                  </select>
+                  <button type="button" class="btn btn-success ml-2" onclick="showAddModal()" style="margin-left: 10px;">
+                      <i class="fas fa-user-plus"></i> Add 
+                  </button>
+              </div>
               </div>
               <!-- /.col -->
             </div>
@@ -276,16 +283,78 @@
     <!-- /.modal-dialog -->
 </div>
 <!-- /.modal -->
+
+<div class="modal fade" id="customerModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+     <div class="modal-content">
+        <div class="modal-header">
+           <h5 class="modal-title" id="modalLabel">Add Customer</h5>
+           <button type="button" class="close" onclick="hideCustomerModal()" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+           </button>
+        </div>
+        <div class="modal-body">
+           <form id="customerForm">
+              <input type="hidden" id="customerId">
+              <div class="form-group">
+                 <label for="customerName">Name</label>
+                 <input type="text" class="form-control" id="customerName" required>
+              </div>
+           </form>
+        </div>
+        <div class="modal-footer">
+           <button type="button" class="btn btn-secondary" onclick="hideCustomerModal()">Close</button>
+           <button type="button" class="btn btn-primary" onclick="saveCustomer()">Save changes</button>
+        </div>
+     </div>
+  </div>
+</div>
   
   
 <script>
   const productTable = document.getElementById('productTable')
   const productModal = document.getElementById('productModal')
   const checkoutModal = document.getElementById('checkoutModal')
+  const customerModal = document.getElementById('customerModal')
+  const customerSelect = document.getElementById('customerSelect')
   
-
+  let customers = []
   let categories = []
   let cart = []
+  let isCheckoutModalActive = false
+
+  async function fetchCustomers() {
+    const res = await fetch('api/customer')
+    const data = await res.json()
+    customerSelect.innerHTML = data.data.map(cms => `
+        <option value="${cms.id}">${cms.name}</option>
+      `).join('');
+  }
+
+
+  function showAddModal(){
+    showCustomerModal()
+    document.getElementById('modalLabel').textContent = 'Add Customer'
+    document.getElementById('customerForm').reset()
+    document.getElementById('customerId').value = ''
+  }
+
+  async function saveCustomer() {
+      const id = document.getElementById('customerId').value
+      const name = document.getElementById('customerName').value
+
+      const payload = { id, name }
+      const url = '/api/add-customer'
+
+      await fetch(url, {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify(payload),
+      });
+
+      hideCustomerModal()
+      fetchCustomers();
+ }
 
   async function fetchCategories() {
     const res = await fetch('api/category')
@@ -399,6 +468,8 @@
   }
 
   function checkout(){
+    $('#checkoutModal').modal('show')
+    fetchCustomers()
     const checkoutCartTable = document.getElementById('checkoutCartTable')
     const totalAmount = cart.reduce((total, item) => total + item.subtotal, 0)
     const totalAmountElement = document.getElementById('totalAmount')
@@ -407,6 +478,7 @@
     const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]')
     const dueDateRow = document.getElementById('dueDateRow')
     let currentPayNowOption = 'paid'
+
 
     checkoutCartTable.innerHTML = cart.map(item => `
         <tr>
@@ -501,6 +573,7 @@
   }
 
   async function sendCheckoutData() {
+    const customer = parseInt(document.getElementById('customerSelect').value, 10);
     const payNowOption = document.querySelector('input[name="payNowOption"]:checked').value
     const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || null
     const paymentAmount = parseFloat(document.getElementById('paymentAmount').value) || 0
@@ -564,14 +637,16 @@
         payment_method: payNowOption === 'no' ? null : paymentMethod,
         cart: cart.map(item => ({
             product_id: item.id,
+            price: item.price,
             quantity: item.quantity
         })),
         payment: paymentAmount,
         due_date: dueDate,
-        note: document.getElementById('paymentNotes')?.value || ''
+        note: document.getElementById('paymentNotes')?.value || '',
+        customer_id: customer
     }
 
-    // console.log(checkoutData)
+    console.log(checkoutData)
 
     const result = await Swal.fire({
       title: 'Confirm Checkout',
@@ -630,6 +705,24 @@
     $('#checkoutModal').modal('hide')
 
   }
+
+  function showCustomerModal() {
+    if (isCheckoutModalActive) {
+      $('#checkoutModal').modal('hide');
+        $('body').css('overflow', 'auto');
+    }
+    $('#customerModal').modal('show');
+        $('body').css('overflow', 'hidden');
+  }
+
+  function hideCustomerModal() {
+    $('#customerModal').modal('hide');
+    $('body').css('overflow', 'auto');
+    if (isCheckoutModalActive) {
+      $('#checkoutModal').modal('show');
+    }
+  }
+  
   fetchProduct()
 </script>
 @endsection

@@ -6,7 +6,6 @@ use App\Models\Payment;
 use App\Models\Product;
 use App\Models\TransactionDetail;
 use App\Models\Transactions;
-use App\Models\TransactionStatusHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -20,11 +19,13 @@ class TransactionsController extends Controller
 
         $validated = $request->validate([
             'transaction_date' => 'required|date',
+            'customer_id' => 'required|exists:customers,id',
             'due_date' => 'nullable|date',
             'payment_method' => 'nullable|string',
             'payment_status' => 'nullable|string',
             'cart' => 'required|array',
             'cart.*.product_id' => 'required|exists:products,id',
+            'cart.*.price' => 'required|numeric|min:0',
             'cart.*.quantity' => 'required|integer|min:1',
             'payment' => 'required|numeric|min:0',
             'note' => 'nullable|string',
@@ -40,7 +41,8 @@ class TransactionsController extends Controller
                 'transaction_date' => $validated['transaction_date'],
                 'due_date' => $validated['due_date'],
                 'total_amount' => 0,
-                'payment_status' => $validated['payment_status']
+                'payment_status' => $validated['payment_status'],
+                'customer_id' => $validated['customer_id'],
             ]);
 
             foreach ($validated['cart'] as $item) {
@@ -56,6 +58,7 @@ class TransactionsController extends Controller
                 TransactionDetail::create([
                     'transaction_id' => $transaction->id,
                     'product_id' => $product->id,
+                    'price' => $item['price'],
                     'quantity' => $item['quantity'],
                     'subtotal' => $subtotal,
                 ]);
@@ -74,12 +77,6 @@ class TransactionsController extends Controller
                 'note' => $validated['note'],
             ]);
 
-            $transaction_history = TransactionStatusHistory::create([
-                'transaction_id' => $transaction->id,
-                'status' => $validated['payment_status'],
-                'status_date' => $validated['transaction_date'],
-            ]);
-
             DB::commit();
 
             return response()->json([
@@ -88,7 +85,6 @@ class TransactionsController extends Controller
                 'data' => [
                     'transaction' => $transaction,
                     'payment' => $payment,
-                    'transaction_history' => $transaction_history,
                 ],
             ]);
 
