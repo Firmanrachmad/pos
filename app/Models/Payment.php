@@ -20,7 +20,8 @@ class Payment extends Model
         'payment_method',
         'payment',
         'change',
-        'note'
+        'note',
+        'status'
 
     ];
 

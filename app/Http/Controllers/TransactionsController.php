@@ -19,10 +19,10 @@ class TransactionsController extends Controller
 
         $validated = $request->validate([
             'transaction_date' => 'required|date',
-            'customer_id' => 'required|exists:customers,id',
+            'customer_id' => 'nullable|exists:customers,id',
             'due_date' => 'nullable|date',
             'payment_method' => 'nullable|string',
-            'payment_status' => 'nullable|string',
+            'payment_status' => 'required|string',
             'cart' => 'required|array',
             'cart.*.product_id' => 'required|exists:products,id',
             'cart.*.price' => 'required|numeric|min:0',
@@ -75,6 +75,7 @@ class TransactionsController extends Controller
                 'payment' => $validated['payment'],
                 'change' => $validated['payment'] - $total_price,
                 'note' => $validated['note'],
+                'status' => $validated['payment_status'],
             ]);
 
             DB::commit();

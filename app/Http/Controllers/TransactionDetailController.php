@@ -21,7 +21,12 @@ class TransactionDetailController extends Controller
 
     public function show($id){
 
-        $transaction = Transactions::with('transactionDetails')->find($id);
+        $transaction = Transactions::with([
+            'transactionDetails',
+            'transactionDetails.product', 
+            'payment',
+            'customer'
+        ])->find($id);
 
         if (!$transaction) {
             return response()->json([

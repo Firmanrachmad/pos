@@ -174,10 +174,20 @@
                 <div style="display: inline-flex; align-items: center; margin-left: 10px;">
                   <select class="form-control" id="customerSelect" style="width: 150px; height: 35px;" required>
                   </select>
-                  <button type="button" class="btn btn-success ml-2" onclick="showAddModal()" style="margin-left: 10px;">
+                  <button type="button" class="btn btn-success ml-2" onclick="showAddCustomerInput()" style="margin-left: 10px;">
                       <i class="fas fa-user-plus"></i> Add 
                   </button>
+                </div>
               </div>
+              <div class="col-sm-4" id="addCustomerInput" style="display: none;">
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <b>Add New Customer</b>
+                    <input type="text" id="customerName" class="form-control" placeholder="Enter new customer name" style="width: 200px;">
+                     <div style="display: flex; gap: 5px;">
+                         <button type="button" class="btn btn-success btn-sm" onclick="saveCustomer()">Save</button>
+                          <button type="button" class="btn btn-secondary btn-sm" onclick="hideAddCustomerInput()">Cancel</button>
+                    </div>
+                </div>
               </div>
               <!-- /.col -->
             </div>
@@ -322,28 +332,33 @@
   let categories = []
   let cart = []
   let isCheckoutModalActive = false
+  let isAddCustomerInputActive = false
 
   async function fetchCustomers() {
     const res = await fetch('api/customer')
     const data = await res.json()
-    customerSelect.innerHTML = data.data.map(cms => `
+    customerSelect.innerHTML = `
+    <option value="" disabled selected>Select Customer</option>
+      ${data.data.map(cms => `
         <option value="${cms.id}">${cms.name}</option>
-      `).join('');
+      `).join('')}
+    `;
   }
 
+  function showAddCustomerInput() {
+    document.getElementById('addCustomerInput').style.display = 'block'
+    isAddCustomerInputActive = true
+  }
 
-  function showAddModal(){
-    showCustomerModal()
-    document.getElementById('modalLabel').textContent = 'Add Customer'
-    document.getElementById('customerForm').reset()
-    document.getElementById('customerId').value = ''
+  function hideAddCustomerInput() {
+    document.getElementById('addCustomerInput').style.display = 'none'
+    isAddCustomerInputActive = false
   }
 
   async function saveCustomer() {
-      const id = document.getElementById('customerId').value
       const name = document.getElementById('customerName').value
 
-      const payload = { id, name }
+      const payload = { name }
       const url = '/api/add-customer'
 
       await fetch(url, {
@@ -351,9 +366,8 @@
          headers: { 'Content-Type': 'application/json' },
          body: JSON.stringify(payload),
       });
-
-      hideCustomerModal()
-      fetchCustomers();
+      hideAddCustomerInput()
+      fetchCustomers()
  }
 
   async function fetchCategories() {
@@ -589,13 +603,22 @@
           return
       }
     } else if (payNowOption === 'unpaid') {
-        if (!dueDate) {
+      if (!dueDate) {
         Swal.fire({
             icon: 'error',
-            title: 'Please enter due date if payment is not fully paid.'
-        })
-        return
-        }
+            title: 'Please enter a due date.'
+        });
+        return;
+      }
+
+      if (!customer) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Please select a customer.'
+        });
+        return;
+      }
+
     } else if (payNowOption === 'pending') {
       if(paymentAmount === 0){
         Swal.fire({
@@ -615,6 +638,14 @@
         Swal.fire({
             icon: 'error',
             title: 'Please enter due date if payment is not fully paid.'
+        })
+        return
+      }
+
+      if (!customer) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Please select a customer.'
         })
         return
       }

@@ -143,7 +143,7 @@
                   </li>
                   <li class="nav-item">
                      <a href="/report" class="nav-link {{ Request::is('report') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-file-alt"></i>
+                        <i class="nav-icon fas fa-paste"></i>
                         <p>
                            Reporting
                         </p>
