@@ -142,7 +142,7 @@
                </div>
                <!-- Payment History -->
               <div class="row mt-3" id="paymentHistorySection" style="display: none;">
-               <div class="col-12 table-responsive">
+                  <div class="col-12 table-responsive">
                     <table class="table table-striped">
                        <thead>
                           <tr>
@@ -160,6 +160,62 @@
                  <!-- /.col -->
               </div>
               <!-- /.row -->
+              <div class="row mt-3">
+                  <div class="col-12">
+                     <button type="button" class="btn btn-success ml-2 mb-2" onclick="payNow()" id="showPayNowButton">
+                        <i class="fas fa-hand-holding-usd"></i> Pay Now
+                  </div>
+                  <!-- /.col -->
+               </div>
+               <div class="row" id="payNowSection">
+                  <!-- accepted payments column -->
+                  <div class="col-6">
+                    <p class="lead">Payment Methods</p>
+                    <div class="form-group">
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="paymentCash" value="cash" checked>
+                        <label class="form-check-label" for="paymentCash">Cash</label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="paymentEwallet" value="ewallet">
+                        <label class="form-check-label" for="paymentEwallet">E-Wallet</label>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- /.col -->
+                  <div class="col-6">
+                    <p class="lead">Payment Details</p>
+                    <div class="table-responsive">
+                      <table class="table">
+                        <tr>
+                          <th style="width:50%">Total Remaining Amount:</th>
+                          <td id="totalRemainingAmount">Rp. 0</td>
+                        </tr>
+                        <tr>
+                          <th>Payment:</th>
+                          <td>
+                            <input type="number" id="paymentAmount" class="form-control" placeholder="Enter payment">
+                          </td>
+                        </tr>
+                        <tr>
+                          <th>Change:</th>
+                          <td id="changeAmount"></td>
+                        </tr>
+                        <th>Notes:</th>
+                          <td>
+                            <input type="text" id="paymentNotes" class="form-control" placeholder="Enter notes">
+                        </td>
+                      </table>
+                    </div>
+                  </div>              
+                  <!-- /.col -->
+                </div>
+                <div class="row mt-2" id="paymentActions">
+                  <div class="col-12 d-flex justify-content-end">
+                    <button type="button" class="btn btn-secondary mr-2" onclick="cancelPayment()">Cancel</button>
+                    <button type="button" class="btn btn-success" onclick="submitPayment()">Confirm</button>
+                  </div>
+                </div>
            </div>
            <!-- /.invoice -->
         </div>
@@ -313,8 +369,6 @@
         paymentHistorySection.style.display = 'none'
         showPaymentHistoryButton.innerHTML = '<i class="fas fa-history"></i> Show Payment History'
     }
-
-
   }
 
 

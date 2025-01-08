@@ -356,9 +356,10 @@
   }
 
   async function saveCustomer() {
+      const id = document.getElementById('customerId').value
       const name = document.getElementById('customerName').value
 
-      const payload = { name }
+      const payload = { id, name }
       const url = '/api/add-customer'
 
       await fetch(url, {
@@ -691,7 +692,7 @@
 
     if(result.isConfirmed){
       try {
-        const response = await fetch('http://localhost:8000/api/checkout', {
+        const response = await fetch('api/checkout', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json',

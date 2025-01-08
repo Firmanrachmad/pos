@@ -58,7 +58,7 @@ class TransactionsController extends Controller
                 TransactionDetail::create([
                     'transaction_id' => $transaction->id,
                     'product_id' => $product->id,
-                    'price' => $item['price'],
+                    'price' => $product->price,
                     'quantity' => $item['quantity'],
                     'subtotal' => $subtotal,
                 ]);
