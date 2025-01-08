@@ -25,4 +25,12 @@ class ViewController extends Controller
     public function transaction(){
         return view('transactions');
     }
+
+    public function payment(){
+        return view('payments');
+    }
+
+    public function reporting(){
+        return view('reportings');
+    }
 }

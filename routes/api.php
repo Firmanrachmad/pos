@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TransactionDetailController;
 use App\Http\Controllers\TransactionsController;
+use App\Models\Payment;
 use App\Models\TransactionDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -46,3 +48,5 @@ Route::delete('delete-customer/{id}', [CustomerController::class, 'destroy']);
 Route::post('checkout', [TransactionsController::class, 'checkout']);
 Route::get('show-detail/{id}', [TransactionDetailController::class, 'show']);
 Route::get('transaction', [TransactionDetailController::class, 'index']);
+Route::post('pay/{id}', [PaymentController::class, 'pay']);
+Route::get('payment', [PaymentController::class, 'index']);

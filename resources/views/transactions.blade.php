@@ -30,7 +30,7 @@
                   </div>
                   <!-- /.card-header -->
                   <div class="card-body">
-                     <table id="example2" class="table table-bordered table-hover">
+                     <table id="example1" class="table table-bordered table-striped">
                         <thead>
                            <tr>
                               <th>#</th>
@@ -162,28 +162,14 @@
               <!-- /.row -->
               <div class="row mt-3">
                   <div class="col-12">
-                     <button type="button" class="btn btn-success ml-2 mb-2" onclick="payNow()" id="showPayNowButton">
+                     <button type="button" class="btn btn-success ml-2 mb-2" onclick="payNow()" id="payNowButton">
                         <i class="fas fa-hand-holding-usd"></i> Pay Now
                   </div>
                   <!-- /.col -->
                </div>
                <div class="row" id="payNowSection">
-                  <!-- accepted payments column -->
-                  <div class="col-6">
-                    <p class="lead">Payment Methods</p>
-                    <div class="form-group">
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="paymentMethod" id="paymentCash" value="cash" checked>
-                        <label class="form-check-label" for="paymentCash">Cash</label>
-                      </div>
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="paymentMethod" id="paymentEwallet" value="ewallet">
-                        <label class="form-check-label" for="paymentEwallet">E-Wallet</label>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- /.col -->
-                  <div class="col-6">
+                  <!-- Payment Details Column -->
+                  <div class="col-12">
                     <p class="lead">Payment Details</p>
                     <div class="table-responsive">
                       <table class="table">
@@ -201,16 +187,30 @@
                           <th>Change:</th>
                           <td id="changeAmount"></td>
                         </tr>
-                        <th>Notes:</th>
+                        <tr>
+                          <th>Payment Method:</th>
+                          <td>
+                            <div class="form-check">
+                              <input class="form-check-input" type="radio" name="paymentMethod" id="paymentCash" value="cash" checked>
+                              <label class="form-check-label" for="paymentCash">Cash</label>
+                            </div>
+                            <div class="form-check">
+                              <input class="form-check-input" type="radio" name="paymentMethod" id="paymentEwallet" value="ewallet">
+                              <label class="form-check-label" for="paymentEwallet">E-Wallet</label>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th>Notes:</th>
                           <td>
                             <input type="text" id="paymentNotes" class="form-control" placeholder="Enter notes">
-                        </td>
+                          </td>
+                        </tr>
                       </table>
                     </div>
-                  </div>              
-                  <!-- /.col -->
+                  </div>
                 </div>
-                <div class="row mt-2" id="paymentActions">
+                <div class="row mt-2" id="paymentAction">
                   <div class="col-12 d-flex justify-content-end">
                     <button type="button" class="btn btn-secondary mr-2" onclick="cancelPayment()">Cancel</button>
                     <button type="button" class="btn btn-success" onclick="submitPayment()">Confirm</button>
@@ -234,12 +234,29 @@
 <script>
   const transacionTable = document.getElementById('transactionTable')
   const transactionModal = document.getElementById('transactionModal')
+  const transactionDetailTable = document.getElementById('transactionDetailTable')
+  const payNowButton = document.getElementById('payNowButton')
+  const payNowSection = document.getElementById('payNowSection')
+  const paymentAction = document.getElementById('paymentAction')
+  const paymentHistorySection = document.getElementById('paymentHistorySection')
+  const showPaymentHistoryButton = document.getElementById('showPaymentHistoryButton')
+  const paymentHistoryTable = document.getElementById('paymentHistoryTable')
+  
+  let currentTransactionData = null
+  let changeGlobal = 0
 
   async function fetchTransaction() {
     const res = await fetch('api/transaction')
     const data = await res.json()
     transactionTable.innerHTML = data.data.map((trs, index) => {
-        const paymentStatus = getPaymentStatusBadge(trs.payment_status)
+        let paymentStatus = getPaymentStatusBadge(trs.payment_status)
+        let payNowButtonHtml = '';
+
+         if(trs.payment_status === 'unpaid' || trs.payment_status === 'pending') {
+            payNowButtonHtml = `<button class="btn btn-success btn-sm ml-2" onclick="viewTransaction(${trs.id})">
+               <i class="fas fa-hand-holding-usd"></i> Pay Now
+            </button>`
+         }
 
         return `
           <tr>
@@ -247,7 +264,9 @@
               <td>${trs.transaction_number}</td>
               <td>${trs.customer && trs.customer.name ? trs.customer.name : '-'}</td>
               <td>${formatCurrency(trs.total_amount)}</td>
-              <td>${paymentStatus}</td>
+              <td>
+                  ${paymentStatus} ${payNowButtonHtml}
+               </td>
               <td>
                 <button class="btn btn-primary btn-sm" onclick="viewTransaction(${trs.id})">
                     <i class="fas fa-eye"></i>
@@ -276,16 +295,17 @@
     }).format(amount);
 
     if (amount < 0) {
-        return `<span style="color: red;">${formattedAmount}</span>`;
+      return `<span style="color: red;">${formattedAmount}</span>`;
     }
     return formattedAmount;
   }
 
-  let currentTransactionData = null
-
   async function viewTransaction(id) {
 
     $('#transactionModal').modal('show')
+    paymentHistorySection.style.display = "none"
+    showPaymentHistoryButton.innerHTML = '<i class="fas fa-history"></i> Show Payment History'
+    currentTransactionData = null
 
       try {
 
@@ -293,8 +313,8 @@
         const { status, data } = await res.json()
         console.log(data);
 
-        if(status === 'success') {
 
+        if(status === 'success') {
           currentTransactionData = data
             
           document.getElementById('transactionDate').textContent = `Transaction Date: ${data.transaction_date}`
@@ -305,7 +325,6 @@
           const paymentStatusBadge = getPaymentStatusBadge(data.payment_status)
           document.getElementById('paymentStatusBadgeModal').innerHTML = paymentStatusBadge
 
-          const transactionDetailTable = document.getElementById('transactionDetailTable')
           transactionDetailTable.innerHTML = data.transaction_details.map((trs, index) => {
             return `
                 <tr>
@@ -326,9 +345,13 @@
             </tr>
           `;
 
-          document.getElementById('paymentHistorySection').style.display = 'none';
+          payNowButton.style.display = "none"
+          payNowSection.style.display = "none"
+          paymentAction.style.display = "none"
 
-          showPaymentHistory()
+          if(data.payment_status === 'unpaid' || data.payment_status === 'pending') {
+            payNowButton.style.display = 'block'
+          }
 
         } else {
           alert('Failed to fetch transaction details')
@@ -341,11 +364,9 @@
   }
 
   function showPaymentHistory() {
-    const paymentHistorySection = document.getElementById('paymentHistorySection')
-    const showPaymentHistoryButton = document.getElementById('showPaymentHistoryButton')
+
 
     if(currentTransactionData && currentTransactionData.payment){
-      const paymentHistoryTable = document.getElementById('paymentHistoryTable')
 
       paymentHistoryTable.innerHTML = currentTransactionData.payment.map((pay, index) => {
         const paymentStatus = getPaymentStatusBadge(pay.status)
@@ -369,6 +390,102 @@
         paymentHistorySection.style.display = 'none'
         showPaymentHistoryButton.innerHTML = '<i class="fas fa-history"></i> Show Payment History'
     }
+  }
+
+  function payNow(){
+   $('#payNowSection').show()
+   $('#paymentAction').show()
+   document.getElementById('paymentCash').checked = true
+   document.getElementById('paymentNotes').value = ''
+
+   const paymentAmount = document.getElementById('paymentAmount');
+   const totalRemainingAmountElement = document.getElementById('totalRemainingAmount')
+
+   const totalPayment = currentTransactionData.payment.reduce((sum, pay) => sum + parseFloat(pay.payment || 0), 0)
+
+   const totalRemainingAmount = currentTransactionData.total_amount - totalPayment
+
+   totalRemainingAmountElement.textContent = formatCurrency(totalRemainingAmount)
+
+   const paymentInput = document.getElementById('paymentAmount')
+   const changeAmountElement = document.getElementById('changeAmount')
+
+   paymentInput.value = ''
+   changeAmountElement.textContent = formatCurrency(0)
+
+   paymentInput.addEventListener('input', function() {
+      const payment = parseInt(paymentInput.value)
+      const change = payment - totalRemainingAmount
+      changeGlobal = change
+      changeAmountElement.innerHTML = formatCurrency(change)
+   })
+  }
+
+   async function submitPayment(){
+      const paymentAmount = document.getElementById('paymentAmount').value
+      const changeAmount = changeGlobal
+      const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value
+      const paymentNotes = document.getElementById('paymentNotes').value || ''
+   
+      if(paymentAmount <= 0) {
+         alert('Payment amount must be greater than 0')
+         return
+      }
+
+      const now = new Date()
+      const formattedDate = now.toISOString().slice(0, 10)
+      const formattedTime = now.toLocaleTimeString('id-ID', {
+         hour: '2-digit',
+         minute: '2-digit',
+         second: '2-digit',
+         hour12: false
+      })
+      
+      const paymentDate = `${formattedDate} ${formattedTime}`
+   
+      const data = {
+         payment_date: paymentDate,
+         payment_method: paymentMethod,
+         payment: paymentAmount,
+         change: changeAmount,
+         note: paymentNotes
+      }
+
+      // console.log(data)
+   
+      try {
+         const res = await fetch('api/pay/' + currentTransactionData.id, {
+            method: 'POST',
+            headers: {
+               'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+         })
+
+         const updatedTransaction = await fetch('api/show-detail/' + currentTransactionData.id)
+            .then((res) => res.json())
+            .then((data) => data.data);
+
+         currentTransactionData = updatedTransaction
+         showPaymentHistory()
+         fetchTransaction()
+         viewTransaction(currentTransactionData.id)
+
+         paymentHistorySection.style.display = 'block'
+         showPaymentHistoryButton.innerHTML = '<i class="fas fa-history"></i> Hide Payment History'
+
+         $('#payNowSection').hide()
+         $('#paymentAction').hide()
+   
+         console.log('Payment submitted:', res)
+      } catch (error) {
+         console.error('Error submitting payment:', error)
+      }
+   }
+
+  function cancelPayment(){
+    $('#payNowSection').hide()
+    $('#paymentAction').hide()
   }
 
 

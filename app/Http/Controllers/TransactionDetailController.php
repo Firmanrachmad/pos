@@ -24,7 +24,9 @@ class TransactionDetailController extends Controller
         $transaction = Transactions::with([
             'transactionDetails',
             'transactionDetails.product', 
-            'payment',
+            'payment' => function($query) {
+                $query->orderBy('payment_date', 'desc');
+            },
             'customer'
         ])->find($id);
 

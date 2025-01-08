@@ -31,6 +31,8 @@
       <link rel="stylesheet" href="{{ asset('admins/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
       <!-- SweetAlert2 -->
       <link rel="stylesheet" href="{{ asset('admins/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') }}">
+      <!-- Select2 -->
+      <link rel="stylesheet" href="{{ asset('admins/plugins/select2/css/select2.min.css') }}">
       <!-- Toastr -->
       <link rel="stylesheet" href="{{ asset('admins/plugins/toastr/toastr.min.css') }}">
       <script src="{{ asset('admins/plugins/jquery/jquery.min.js') }}"></script>
@@ -295,10 +297,15 @@
       <script src="{{ asset('admins/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
       <!-- Toastr -->
       <script src="{{ asset('admins/plugins/toastr/toastr.min.js') }}"></script>
+      <!-- Select2 -->
+      <script src="{{ asset('admins/plugins/select2/js/select2.full.min.js') }}"></script>
       <script>
          $(function () {
-            
-            
+           $('.select2').select2()
+         });
+     </script>
+      <script>
+         $(function () {
             $("#example1").DataTable({
                "responsive": true, "lengthChange": true, "autoWidth": true,
                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
@@ -312,7 +319,6 @@
                "autoWidth": false,
                "responsive": true,
             });
-            
          });
       </script>
    </body>
