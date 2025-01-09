@@ -479,7 +479,16 @@
   }
 
   function formatCurrency(amount) {
-    return amount.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
+    const formattedAmount = new Intl.NumberFormat('id-ID', { 
+        style: 'currency', 
+        currency: 'IDR' 
+    }).format(amount);
+
+    if (amount < 0) {
+      return `<span style="color: red;">${formattedAmount}</span>`;
+    }
+    return formattedAmount;
+
   }
 
   function checkout(){
@@ -546,7 +555,7 @@
             paymentInput.disabled = true
             paymentInput.value = 0
             const change = 0 - totalAmount
-            changeAmountElement.textContent = formatCurrency(change)
+            changeAmountElement.innerHTML = formatCurrency(change)
             dueDateRow.style.display = 'table-row'
           } else if (event.target.value === 'pending') {
             document.getElementById('paymentCash').checked = true
@@ -566,7 +575,7 @@
         if (currentPayNowOption === 'paid' && change < 0) {
           change = 0;
         }
-        changeAmountElement.textContent = formatCurrency(change)
+        changeAmountElement.innerHTML = formatCurrency(change)
     })
 
     $('#checkoutModal').on('hidden.bs.modal', function () {

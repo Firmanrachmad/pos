@@ -33,6 +33,13 @@
       <link rel="stylesheet" href="{{ asset('admins/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') }}">
       <!-- Select2 -->
       <link rel="stylesheet" href="{{ asset('admins/plugins/select2/css/select2.min.css') }}">
+      <link rel="stylesheet" href="{{ asset('admins/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
+      <!-- Bootstrap4 Duallistbox -->
+      <link rel="stylesheet" href="{{ asset('admins/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css') }}">
+      <!-- BS Stepper -->
+      <link rel="stylesheet" href="{{ asset('admins/plugins/bs-stepper/css/bs-stepper.min.css') }}">
+      <!-- dropzonejs -->
+      <link rel="stylesheet" href="{{ asset('admins/plugins/dropzone/min/dropzone.min.css')}}">
       <!-- Toastr -->
       <link rel="stylesheet" href="{{ asset('admins/plugins/toastr/toastr.min.css') }}">
       <script src="{{ asset('admins/plugins/jquery/jquery.min.js') }}"></script>
@@ -293,19 +300,30 @@
       <script src="{{ asset('admins/plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
       <script src="{{ asset('admins/plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
       <script src="{{ asset('admins/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
+      <!-- Select2 -->
+      <script src="{{ asset('admins/plugins/select2/js/select2.full.min.js') }}"></script>
+      <!-- Bootstrap4 Duallistbox -->
+      <script src="{{ asset('admins/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js') }}"></script>
+      <!-- InputMask -->
+      <script src="{{ asset('admins/plugins/moment/moment.min.js') }}"></script>
+      <script src="{{ asset('admins/plugins/inputmask/jquery.inputmask.min.js') }}"></script>
+      <!-- Bootstrap Switch -->
+      <script src="{{ asset('admins/plugins/bootstrap-switch/js/bootstrap-switch.min.js') }}"></script>
+      <!-- BS-Stepper -->
+      <script src="{{ asset('admins/plugins/bs-stepper/js/bs-stepper.min.js') }}"></script>
+      <!-- dropzonejs -->
+      <script src="{{ asset('admins/plugins/dropzone/min/dropzone.min.js') }}"></script>
       <!-- SweetAlert2 -->
       <script src="{{ asset('admins/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
       <!-- Toastr -->
       <script src="{{ asset('admins/plugins/toastr/toastr.min.js') }}"></script>
-      <!-- Select2 -->
-      <script src="{{ asset('admins/plugins/select2/js/select2.full.min.js') }}"></script>
+
       <script>
          $(function () {
-           $('.select2').select2()
-         });
-     </script>
-      <script>
-         $(function () {
+            $('.select2').select2()
+            $('.select2bs4').select2({
+               theme: 'bootstrap4'
+            })
             $("#example1").DataTable({
                "responsive": true, "lengthChange": true, "autoWidth": true,
                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
