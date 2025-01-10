@@ -31,6 +31,6 @@ class ViewController extends Controller
     }
 
     public function reporting(){
-        return view('reportings');
+        return view('reports');
     }
 }

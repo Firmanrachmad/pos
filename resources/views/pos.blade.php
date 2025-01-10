@@ -172,7 +172,7 @@
                 <b>Payment Due:</b> 2/22/2014<br>
                 <b>Customer:</b> 
                 <div style="display: inline-flex; align-items: center; margin-left: 10px;">
-                  <select class="form-control" id="customerSelect" style="width: 150px; height: 35px;" required>
+                  <select class="form-control select2bs4" id="customerSelect" style="width: 150px; height: 35px;" required>
                   </select>
                   <button type="button" class="btn btn-success ml-2" onclick="showAddCustomerInput()" style="margin-left: 10px;">
                       <i class="fas fa-user-plus"></i> Add 
@@ -338,7 +338,7 @@
     const res = await fetch('api/customer')
     const data = await res.json()
     customerSelect.innerHTML = `
-    <option value="" disabled selected>Select Customer</option>
+    <option value="" selected>-</option>
       ${data.data.map(cms => `
         <option value="${cms.id}">${cms.name}</option>
       `).join('')}

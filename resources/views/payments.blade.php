@@ -38,6 +38,8 @@
                               <th>Payment Method</th>
                               <th>Amount</th>
                               <th>Change</th>
+                              <th>Transaction Status</th>
+                              <th>Transaction ID</th>
                               <th>Notes</th>
                            </tr>
                         </thead>
@@ -50,6 +52,8 @@
                               <th>Payment Method</th>
                               <th>Amount</th>
                               <th>Change</th>
+                              <th>Transaction Status</th>
+                              <th>Transaction ID</th>
                               <th>Notes</th>
                            </tr>
                         </tfoot>
@@ -76,6 +80,8 @@
           <td>${pym.payment_method || '-'}</td>
           <td>${formatCurrency(pym.payment)}</td>
           <td>${formatCurrency(pym.change)}</td>
+          <td>${getPaymentStatusBadge(pym.status)}</td>
+          <td>${pym.transaction.transaction_number}</td>
           <td>${pym.note || '-'}</td>
         </tr>
       `).join('');
@@ -91,6 +97,17 @@
       return `<span style="color: red;">${formattedAmount}</span>`;
     }
     return formattedAmount;
+  }
+
+  function getPaymentStatusBadge(status) {
+    switch (status) {
+        case 'paid':
+          return `<span class="badge badge-success"><i class="fas fa-check-circle"></i> PAID</span>`;
+        case 'unpaid':
+          return `<span class="badge badge-danger"><i class="fas fa-times-circle"></i> UNPAID</span>`;
+        case 'pending':
+          return `<span class="badge badge-warning"><i class="fas fa-clock"></i> PENDING</span>`;
+    }
   }
 
    fetchPayment()

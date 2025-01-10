@@ -151,7 +151,7 @@
                      </a>
                   </li>
                   <li class="nav-item">
-                     <a href="/report" class="nav-link {{ Request::is('report') ? 'active' : '' }}">
+                     <a href="/reports" class="nav-link {{ Request::is('reports') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-paste"></i>
                         <p>
                            Reporting

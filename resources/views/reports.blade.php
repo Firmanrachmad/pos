@@ -102,7 +102,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="customer">Pilih Pelanggan</label>
-                                    <select class="form-control" id="customer" name="customer" style="width: 100%;">
+                                    <select class="form-control select2bs4" id="customer" name="customer" style="width: 100%;">
                                         <option value="all">Semua Pelanggan</option>
                                         <option value="1">Adi</option>
                                         <option value="2">Abid</option>

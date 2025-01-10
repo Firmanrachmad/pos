@@ -24,7 +24,7 @@ Route::get('products', [ViewController::class, 'product']);
 Route::get('pos', [ViewController::class, 'pos']);
 Route::get('transactions', [ViewController::class, 'transaction']);
 Route::get('payments', [ViewController::class, 'payment']);
-Route::get('report', [ViewController::class, 'reporting']);
+Route::get('reports', [ViewController::class, 'reporting']);
 
 
 
