@@ -133,6 +133,9 @@
 <div class="modal fade" id="checkoutModal">
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
+        <div class="overlay" id="checkoutLoadingOverlay" style="display: none;">
+          <i class="fas fa-2x fa-sync fa-spin"></i>
+        </div>
         <div class="modal-header">
           <h4 class="modal-title">Checkout Payment</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -597,6 +600,7 @@
   }
 
   async function sendCheckoutData() {
+    const overlay = document.getElementById('checkoutLoadingOverlay')
     const customer = parseInt(document.getElementById('customerSelect').value, 10);
     const payNowOption = document.querySelector('input[name="payNowOption"]:checked').value
     const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || null
@@ -606,11 +610,8 @@
 
     if (payNowOption === 'paid') {
       if(paymentAmount < totalPrice){
-        Swal.fire({
-          icon: 'info',
-          title: 'Insufficient funds!'
-        })
-          return
+        toastr.info('Please enter a correct payment amount!')
+        return
       }
     } else if (payNowOption === 'unpaid') {
       if (!dueDate) {
@@ -700,6 +701,7 @@
     })
 
     if(result.isConfirmed){
+      overlay.style.display = 'flex'
       try {
         const response = await fetch('api/checkout', {
           method: 'POST',
@@ -740,6 +742,8 @@
               `An error occurred during checkout: ${error.message}`,
               'error'
           )
+      } finally {
+        overlay.style.display = 'none';
       }
       $('#checkoutModal').modal('hide')
     }

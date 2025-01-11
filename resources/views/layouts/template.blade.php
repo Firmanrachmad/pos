@@ -39,11 +39,15 @@
       <!-- BS Stepper -->
       <link rel="stylesheet" href="{{ asset('admins/plugins/bs-stepper/css/bs-stepper.min.css') }}">
       <!-- dropzonejs -->
-      <link rel="stylesheet" href="{{ asset('admins/plugins/dropzone/min/dropzone.min.css')}}">
+      <link rel="stylesheet" href="{{ asset('admins/plugins/dropzone/min/dropzone.min.css') }}">
+      <!-- daterange picker -->
+      <link rel="stylesheet" href="{{ asset('admins/plugins/daterangepicker/daterangepicker.css') }}">
       <!-- Toastr -->
       <link rel="stylesheet" href="{{ asset('admins/plugins/toastr/toastr.min.css') }}">
+      <!-- jQuery -->
       <script src="{{ asset('admins/plugins/jquery/jquery.min.js') }}"></script>
       <script src="{{ asset('admins/plugins/jquery-ui/jquery-ui.min.js') }}"></script>
+      
 
    </head>
    <body class="hold-transition sidebar-mini layout-fixed">
@@ -317,6 +321,8 @@
       <script src="{{ asset('admins/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
       <!-- Toastr -->
       <script src="{{ asset('admins/plugins/toastr/toastr.min.js') }}"></script>
+      <!-- date-range-picker -->
+      <script src="{{ asset('admins/plugins/daterangepicker/daterangepicker.js')}}"></script>
 
       <script>
          $(function () {

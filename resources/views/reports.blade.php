@@ -56,7 +56,7 @@
                           <!-- Jenis Laporan -->
                           <div class="col-md-6">
                               <div class="form-group">
-                                  <label for="reportType">Jenis Laporan</label>
+                                  <label for="reportType">Report Type</label>
                                   <select class="form-control" id="reportType" name="reportType" required>
                                       <option value="transactions">Laporan Transaksi</option>
                                       <option value="payments">Laporan Pembayaran</option>
@@ -70,9 +70,18 @@
                           <!-- Rentang Tanggal -->
                           <div class="col-md-6">
                               <div class="form-group">
-                                  <label for="dateRange">Rentang Tanggal</label>
-                                  <input type="text" class="form-control daterange" id="dateRange" name="dateRange" placeholder="Select Date Range" required>
+                                <label>Date range</label>
+                                <div class="input-group">
+                                  <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                      <i class="far fa-calendar-alt"></i>
+                                    </span>
+                                  </div>
+                                  <input type="text" class="form-control float-right" id="dateRange">
+                                </div>
+                                <!-- /.input group -->
                               </div>
+                              <!-- /.form group -->
                           </div>
                         </div>
 
@@ -80,18 +89,18 @@
                             <!-- Status Pembayaran -->
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="paymentStatus">Status Pembayaran</label>
+                                    <label for="paymentStatus">Transaction Status</label>
                                     <div class="d-flex">
                                         <div class="form-check mr-3">
-                                            <input class="form-check-input" type="checkbox" id="statusPaid" value="paid">
+                                            <input class="form-check-input" type="checkbox" name="payStatus" id="statusPaid" value="paid">
                                             <label class="form-check-label" for="statusPaid">Paid</label>
                                         </div>
                                         <div class="form-check mr-3">
-                                            <input class="form-check-input" type="checkbox" id="statusPending" value="pending">
+                                            <input class="form-check-input" type="checkbox" name="payStatus" id="statusPending" value="pending">
                                             <label class="form-check-label" for="statusPending">Pending</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="statusUnpaid" value="unpaid">
+                                            <input class="form-check-input" type="checkbox" name="payStatus" id="statusUnpaid" value="unpaid">
                                             <label class="form-check-label" for="statusUnpaid">Unpaid</label>
                                         </div>
                                     </div>
@@ -101,9 +110,9 @@
                             <!-- Pelanggan -->
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="customer">Pilih Pelanggan</label>
+                                    <label for="customer">Select Customer</label>
                                     <select class="form-control select2bs4" id="customer" name="customer" style="width: 100%;">
-                                        <option value="all">Semua Pelanggan</option>
+                                        <option value="all">All Customers</option>
                                         <option value="1">Adi</option>
                                         <option value="2">Abid</option>
                                     </select>
@@ -126,4 +135,42 @@
        </div>
     </section>
  </div>
+ <script>
+    $(function () {
+        //Date range picker
+        $('#dateRange').daterangepicker()
+    });
+
+    const refresh = () => {
+        $('#reportingForm').trigger('reset')
+    }
+
+    async function generateReport() {
+        const format = $('input[name="format"]:checked').val() 
+        const reportType = $('#reportType').val()
+        const dateRange = $('#dateRange').val()
+        const paymentStatus = $('input[name="payStatus"]:checked').map(function(){
+            return $(this).val()
+        }).get()
+        const customer = $('#customer').val()
+
+        const data = {
+            format,
+            reportType,
+            dateRange,
+            paymentStatus,
+            customer
+        }
+
+        if(format === undefined || reportType === undefined || dateRange === undefined || payStatus.length === 0) {
+            toastr.error('Please fill all the fields')
+            return
+        }
+
+        console.log(data)
+        
+    }
+
+
+ </script>
 @endsection
