@@ -146,30 +146,51 @@
     }
 
     async function generateReport() {
-        const format = $('input[name="format"]:checked').val() 
-        const reportType = $('#reportType').val()
-        const dateRange = $('#dateRange').val()
-        const paymentStatus = $('input[name="payStatus"]:checked').map(function(){
-            return $(this).val()
-        }).get()
-        const customer = $('#customer').val()
+        const format = $('input[name="format"]:checked').val();
+        const reportType = $('#reportType').val();
+        const dateRange = $('#dateRange').val();
+        const paymentStatus = $('input[name="payStatus"]:checked').map(function () {
+            return $(this).val();
+        }).get();
+        const customer = $('#customer').val();
 
         const data = {
             format,
             reportType,
             dateRange,
             paymentStatus,
-            customer
+            customer,
+        };
+
+        if (format === undefined || reportType === undefined || dateRange === undefined || paymentStatus.length === 0) {
+            toastr.error('Please fill all the fields');
+            return;
         }
 
-        if(format === undefined || reportType === undefined || dateRange === undefined || payStatus.length === 0) {
-            toastr.error('Please fill all the fields')
-            return
-        }
+        const response = await fetch('/api/report', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
 
-        console.log(data)
-        
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `report.${format}`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        } else {
+            const error = await response.json();
+            console.error('Error generating report:', error);
+            toastr.error('Failed to generate report.');
+        }
     }
+
+
 
 
  </script>
