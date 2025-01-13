@@ -111,10 +111,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="customer">Select Customer</label>
-                                    <select class="form-control select2bs4" id="customer" name="customer" style="width: 100%;">
-                                        <option value="all">All Customers</option>
-                                        <option value="1">Adi</option>
-                                        <option value="2">Abid</option>
+                                    <select class="form-control select2bs4" id="customerSelect" tyle="width: 100%;">
                                     </select>
                                 </div>
                             </div>
@@ -137,13 +134,36 @@
  </div>
  <script>
     $(function () {
-        //Date range picker
         $('#dateRange').daterangepicker()
     });
 
     const refresh = () => {
         $('#reportingForm').trigger('reset')
     }
+
+    async function fetchCustomers() {
+        try {
+            const res = await fetch('api/customer')
+            if (!res.ok) throw new Error('Failed to fetch customers')
+            const response = await res.json()
+
+            const customers = response.data || response
+            document.getElementById('customerSelect').innerHTML = `
+                <option value="all" selected>All Customers</option>
+                ${customers.map(customer => `
+                    <option value="${customer.id}">${customer.name}</option>
+                `).join('')}
+            `;
+
+            $('.select2bs4').select2({
+                theme: 'bootstrap4',
+            });
+        } catch (error) {
+            console.error('Error fetching customers:', error)
+            toastr.error('Failed to load customers.')
+        }
+    }
+
 
     async function generateReport() {
         const format = $('input[name="format"]:checked').val();
@@ -152,7 +172,7 @@
         const paymentStatus = $('input[name="payStatus"]:checked').map(function () {
             return $(this).val();
         }).get();
-        const customer = $('#customer').val();
+        const customer = document.getElementById('customerSelect').value
 
         const data = {
             format,
@@ -160,7 +180,9 @@
             dateRange,
             paymentStatus,
             customer,
-        };
+        }
+
+        console.log(data)
 
         if (format === undefined || reportType === undefined || dateRange === undefined || paymentStatus.length === 0) {
             toastr.error('Please fill all the fields');
@@ -189,6 +211,8 @@
             toastr.error('Failed to generate report.');
         }
     }
+
+    fetchCustomers()
 
 
 
