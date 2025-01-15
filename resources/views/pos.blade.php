@@ -264,7 +264,9 @@
                     <tr id="dueDateRow" style="display: none;">
                       <th>Due Date:</th>
                       <td>
-                        <input type="date" id="dueDate" class="form-control">
+                        <div class="d-flex">
+                          <input type="date" id="dueDate" class="form-control">
+                        </div>
                       </td>
                     </tr>
                     <tr>
@@ -272,9 +274,13 @@
                       <td id="changeAmount"></td>
                     </tr>
                     <th>Notes:</th>
-                      <td>
-                        <input type="text" id="paymentNotes" class="form-control" placeholder="Enter notes">
+                    <td>
+                      <input type="text" id="paymentNotes" class="form-control" placeholder="Enter notes">
                     </td>
+                    <tr>
+                      <th><input class="form-check-input" type="checkbox" id="printInvoice" value="true" checked> 
+                        Print Invoce </th>
+                    </tr>
                   </table>
                 </div>
               </div>              
@@ -288,7 +294,7 @@
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           <button type="button" class="btn btn-success" onclick="sendCheckoutData()"><i class="far fa-credit-card"></i> Submit
             Payment
-          </button>
+          </button>               
         </div>
       </div>
       <!-- /.modal-content -->
@@ -297,32 +303,7 @@
 </div>
 <!-- /.modal -->
 
-<div class="modal fade" id="customerModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-     <div class="modal-content">
-        <div class="modal-header">
-           <h5 class="modal-title" id="modalLabel">Add Customer</h5>
-           <button type="button" class="close" onclick="hideCustomerModal()" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-           </button>
-        </div>
-        <div class="modal-body">
-           <form id="customerForm">
-              <input type="hidden" id="customerId">
-              <div class="form-group">
-                 <label for="customerName">Name</label>
-                 <input type="text" class="form-control" id="customerName" required>
-              </div>
-           </form>
-        </div>
-        <div class="modal-footer">
-           <button type="button" class="btn btn-secondary" onclick="hideCustomerModal()">Close</button>
-           <button type="button" class="btn btn-primary" onclick="saveCustomer()">Save changes</button>
-        </div>
-     </div>
-  </div>
-</div>
-  
+<iframe id="invoiceViewer" style="width: 100%; height: 500px;" hidden></iframe>
   
 <script>
   const productTable = document.getElementById('productTable')
@@ -505,7 +486,7 @@
     const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]')
     const dueDateRow = document.getElementById('dueDateRow')
     let currentPayNowOption = 'paid'
-
+    const printInvoice = document.getElementById('printInvoice').checked
 
     checkoutCartTable.innerHTML = cart.map(item => `
         <tr>
@@ -528,8 +509,9 @@
     paymentInput.value = ''
     changeAmountElement.textContent = formatCurrency(0)
 
-    document.getElementById('payNowYes').checked = true;
-    document.getElementById('paymentCash').checked = true;
+    document.getElementById('payNowYes').checked = true
+    document.getElementById('paymentCash').checked = true
+    document.getElementById('printInvoice').checked = true
 
     paymentMethods.forEach(method => {
       method.disabled = false
@@ -600,6 +582,7 @@
   }
 
   async function sendCheckoutData() {
+
     const overlay = document.getElementById('checkoutLoadingOverlay')
     const customer = parseInt(document.getElementById('customerSelect').value, 10);
     const payNowOption = document.querySelector('input[name="payNowOption"]:checked').value
@@ -607,6 +590,7 @@
     const paymentAmount = parseFloat(document.getElementById('paymentAmount').value) || 0
     const totalPrice = cart.reduce((total, item) => total + item.subtotal, 0)
     let dueDate = document.getElementById('dueDate')?.value || null
+    const printInvoice = document.getElementById('printInvoice').checked
 
     if (payNowOption === 'paid') {
       if(paymentAmount < totalPrice){
@@ -637,7 +621,7 @@
           title: 'Please enter a correct payment amount!'
         })
           return
-      } else if (paymentAmount > totalPrice){
+      } else if (paymentAmount >= totalPrice){
         Swal.fire({
           icon: 'info',
           title: 'Please change to yes option if you want to pay in full'
@@ -689,6 +673,7 @@
     }
 
     console.log(checkoutData)
+    console.log(printInvoice)
 
     const result = await Swal.fire({
       title: 'Confirm Checkout',
@@ -719,15 +704,47 @@
     
         const data = await response.json()
         if (data.status === 'success') {
-            Swal.fire(
-              'Success!',
-              'Checkout completed successfully.',
-              'success'
-            );
-            console.log(data.data)
-            cart = []
-            renderCart();
-            $('#checkoutModal').modal('hide');
+          Swal.fire(
+            'Success!',
+            'Checkout completed successfully.',
+            'success'
+          );
+          
+          console.log(data.data)
+          cart = []
+          renderCart();
+          $('#checkoutModal').modal('hide');
+          
+          if (printInvoice) {
+            const invoiceResponse = await fetch('api/invoice', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/pdf',
+                },
+                body: JSON.stringify(checkoutData),
+            });
+
+            if (!invoiceResponse.ok) {
+                throw new Error(`Failed to fetch invoice: ${invoiceResponse.statusText}`)
+            }
+
+            const blob = await invoiceResponse.blob()
+            const url = window.URL.createObjectURL(blob)
+
+            const iframe = document.getElementById('invoiceViewer')
+            iframe.src = url
+
+            iframe.onload = () => {
+              iframe.focus()
+              iframe.contentWindow.print()
+              window.URL.revokeObjectURL(url)
+            }
+
+            iframe.addEventListener('load', () => {
+                window.URL.revokeObjectURL(url)
+            })
+          }
         } else {
             Swal.fire(
               'Error!',
@@ -749,15 +766,6 @@
     }
     $('#checkoutModal').modal('hide')
 
-  }
-
-  function showCustomerModal() {
-    if (isCheckoutModalActive) {
-      $('#checkoutModal').modal('hide');
-        $('body').css('overflow', 'auto');
-    }
-    $('#customerModal').modal('show');
-        $('body').css('overflow', 'hidden');
   }
 
   function hideCustomerModal() {

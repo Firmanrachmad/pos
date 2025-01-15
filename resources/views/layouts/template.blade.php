@@ -54,7 +54,10 @@
       <div class="wrapper">
          <!-- Preloader -->
          <div class="preloader flex-column justify-content-center align-items-center">
-            <img class="animation__shake" src="{{ asset('admins/dist/img/AdminLTELogo.png') }}" alt="AdminLTELogo" height="60" width="60">
+            {{-- <img class="animation__shake" src="{{ asset('admins/dist/img/AdminLTELogo.png') }}" alt="AdminLTELogo" height="60" width="60"> --}}
+            <div class="overlay" style="display: flex;">
+               <i class="fas fa-2x fa-sync fa-spin"></i>
+            </div>
          </div>
          <!-- Navbar -->
          <nav class="main-header navbar navbar-expand navbar-white navbar-light">

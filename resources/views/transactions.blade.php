@@ -223,7 +223,7 @@
         </div>
         <div class="modal-footer justify-content-between">
            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-           <button type="button" class="btn btn-primary" onclick=""><i class="fas fa-print"></i> Print
+           <button type="button" class="btn btn-primary" onclick="printTransaction()"><i class="fas fa-print"></i> Print
            </button>
         </div>
      </div>
@@ -232,6 +232,8 @@
   <!-- /.modal-dialog -->
 </div>
 <!-- /.modal -->
+
+<iframe id="transactionViewer" style="width: 100%; height: 500px;" hidden></iframe>
 
 <script>
   const transacionTable = document.getElementById('transactionTable')
@@ -252,7 +254,7 @@
     const data = await res.json()
     transactionTable.innerHTML = data.data.map((trs, index) => {
         let paymentStatus = getPaymentStatusBadge(trs.payment_status)
-        let payNowButtonHtml = '';
+        let payNowButtonHtml = ''
 
          if(trs.payment_status === 'unpaid' || trs.payment_status === 'pending') {
             payNowButtonHtml = `<button class="btn btn-success btn-sm ml-2" onclick="viewTransaction(${trs.id})">
@@ -484,6 +486,37 @@
       } catch (error) {
          console.error('Error submitting payment:', error)
       }
+   }
+
+   async function printTransaction() {
+      const transactionResponse = await fetch('api/transaction-history/' + currentTransactionData.id, {
+         method: 'POST',
+         headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/pdf',
+         },
+      });
+
+      if (!transactionResponse.ok) {
+         throw new Error(`Failed to fetch invoice: ${transactionResponse.statusText}`)
+      }
+
+      const blob = await transactionResponse.blob()
+      const url = window.URL.createObjectURL(blob)
+
+      const iframe = document.getElementById('transactionViewer')
+      iframe.src = url
+
+      iframe.onload = () => {
+         iframe.focus()
+         iframe.contentWindow.print()
+         window.URL.revokeObjectURL(url)
+      }
+
+      iframe.addEventListener('load', () => {
+         window.URL.revokeObjectURL(url)
+      })
+      
    }
 
   function cancelPayment(){

@@ -2,13 +2,12 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TransactionDetailController;
 use App\Http\Controllers\TransactionsController;
-use App\Models\Payment;
-use App\Models\TransactionDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -52,3 +51,5 @@ Route::get('transaction', [TransactionDetailController::class, 'index']);
 Route::post('pay/{id}', [PaymentController::class, 'pay']);
 Route::get('payment', [PaymentController::class, 'index']);
 Route::post('report', [ReportController::class, 'generateReport']);
+Route::post('invoice', [InvoiceController::class, 'generateInvoice']);
+Route::post('transaction-history/{id}', [InvoiceController::class, 'generateHistory']);
