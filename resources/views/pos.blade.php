@@ -279,7 +279,7 @@
                     </td>
                     <tr>
                       <th><input class="form-check-input" type="checkbox" id="printInvoice" value="true" checked> 
-                        Print Invoce </th>
+                        Print Invoice </th>
                     </tr>
                   </table>
                 </div>

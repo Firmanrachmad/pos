@@ -75,6 +75,9 @@
 <div class="modal fade" id="transactionModal">
   <div class="modal-dialog modal-xl">
      <div class="modal-content">
+         <div class="overlay" id="checkoutLoadingOverlay" style="display: none;">
+            <i class="fas fa-2x fa-sync fa-spin"></i>
+         </div>
         <div class="modal-header">
            <h4 class="modal-title">Transaction Details</h4>
            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -489,13 +492,15 @@
    }
 
    async function printTransaction() {
+      const overlay = document.getElementById('checkoutLoadingOverlay')
+      overlay.style.display = 'flex'
       const transactionResponse = await fetch('api/transaction-history/' + currentTransactionData.id, {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/pdf',
          },
-      });
+      })
 
       if (!transactionResponse.ok) {
          throw new Error(`Failed to fetch invoice: ${transactionResponse.statusText}`)
@@ -516,6 +521,8 @@
       iframe.addEventListener('load', () => {
          window.URL.revokeObjectURL(url)
       })
+
+      overlay.style.display = 'none'
       
    }
 
