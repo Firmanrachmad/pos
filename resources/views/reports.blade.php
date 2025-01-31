@@ -24,6 +24,9 @@
           <div class="row">
              <div class="col-12">
                 <div class="card">
+                    <div class="overlay" id="checkoutLoadingOverlay" style="display: none;">
+                        <i class="fas fa-2x fa-sync fa-spin"></i>
+                      </div>
                    <div class="card-header">
                         <h3 class="card-title">Filtering Options</h3>
                    </div>
@@ -173,6 +176,8 @@
             return $(this).val();
         }).get();
         const customer = document.getElementById('customerSelect').value
+        const overlay = document.getElementById('checkoutLoadingOverlay')
+        overlay.style.display = 'flex'
 
         const data = {
             format,
@@ -205,10 +210,12 @@
             a.download = `report.${format}`;
             a.click();
             window.URL.revokeObjectURL(url);
+            overlay.style.display = 'none'
         } else {
-            const error = await response.json();
-            console.error('Error generating report:', error);
-            toastr.error('Failed to generate report.');
+            const error = await response.json()
+            console.error('Error generating report:', error)
+            toastr.error('Failed to generate report.')
+            overlay.style.display = 'none'
         }
     }
 

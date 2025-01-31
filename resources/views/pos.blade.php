@@ -760,7 +760,7 @@
               'error'
           )
       } finally {
-        overlay.style.display = 'none';
+        overlay.style.display = 'none'
       }
       $('#checkoutModal').modal('hide')
     }

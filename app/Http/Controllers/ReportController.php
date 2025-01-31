@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\TransactionExport;
 use App\Models\Customer;
+use App\Models\Payment;
 use App\Models\Transactions;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -30,22 +31,44 @@ class ReportController extends Controller
             $paymentStatus = $request->input('paymentStatus', []);
             $customerId = $request->input('customer', 'all');
 
-            $query = Transactions::with('customer');
+            $query = null;
 
-            $query->whereBetween('transaction_date', [$startDate, $endDate]);
+            switch($reportType){
+                case 'transactions':
+                    $query = Transactions::with('customer')
+                        ->whereBetween('transaction_date', [$startDate, $endDate]);
 
-            if (!empty($paymentStatus)) {
-                $query->whereIn('payment_status', $paymentStatus);
-            }
+                    if (!empty($paymentStatus)) {
+                        $query->whereIn('payment_status', $paymentStatus);
+                    }
+        
+                    if ($customerId !== 'all') {
+                        $query->where('customer_id', $customerId);
+                    }
 
-            if ($customerId !== 'all') {
-                $query->where('customer_id', $customerId);
-            }
+                    $query->select('id', 'transaction_date', 'transaction_number', 'due_date', 'total_amount', 'payment_status', 'customer_id');
+                    break;
+                    
+                case 'payments':
+                    $query = Payment::with([
+                        'transaction',
+                        'transaction.customer'
+                    ])->whereBetween('payment_date', [$startDate, $endDate]);
 
-            if ($reportType === 'transactions') {
-                $query->select('id', 'transaction_date', 'transaction_number', 'due_date', 'total_amount', 'payment_status', 'customer_id');
-            } elseif ($reportType === 'payments') {
-                $query->select('id', 'payment_date', 'payment_method', 'payment', 'change', 'note');
+                    if (!empty($paymentStatus)) {
+                        $query->whereIn('status', $paymentStatus);
+                    }
+        
+                    if ($customerId !== 'all') {
+                        $query->whereHas('transaction', function ($query) use ($customerId) {
+                            $query->where('customer_id', $customerId);
+                        });
+                    }
+
+                    $query->select('id', 'payment_date', 'payment_method', 'payment', 'change', 'note');
+                    break;
+                default:
+                    throw new \Exception("Invalid report type");    
             }
 
             $data = $query->get();
@@ -59,19 +82,28 @@ class ReportController extends Controller
                     ? Customer::where('id', $customerId)->value('name') ?? 'Unknown Customer'
                     : 'All Customers';
 
-                return $this->generateExcel($data, $format, $startDate, $endDate, $customerName);
+                return $this->generateExcel($data, $format, $reportType, $startDate, $endDate, $customerName);
             } elseif ($format === 'pdf') {
                 return $this->generatePdf($data);
             }
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
-        }
+        }  
     }
 
-    private function generateExcel($data, $format, $startDate, $endDate, $customerName)
+    private function generateExcel($data, $format, $reportType, $startDate, $endDate, $customerName)
     {
         $fileName = 'report.' . $format;
 
-        return Excel::download(new TransactionExport($data, $startDate, $endDate, $customerName), $fileName);
+        switch($reportType){
+            case 'transactions':
+                return Excel::download(new TransactionExport($data, $startDate, $endDate, $customerName), $fileName);
+            case 'payments':
+
+            default:
+                throw new \Exception("Invalid report type");  
+
+        }
+
     }
 }
