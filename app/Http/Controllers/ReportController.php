@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\PaymentExport;
+use App\Exports\ReceivablesExport;
 use App\Exports\TransactionExport;
 use App\Models\Customer;
 use App\Models\Payment;
@@ -67,6 +68,20 @@ class ReportController extends Controller
 
                     $query->select('id', 'payment_date', 'payment_method', 'payment', 'change', 'note', 'status', 'transaction_id');
                     break;
+
+                case 'receivables':
+                    $query = Transactions::with(['customer', 'payment'])
+                        ->whereBetween('transaction_date', [$startDate, $endDate]);
+                    if (!empty($paymentStatus)) {
+                        $query->whereIn('payment_status', $paymentStatus);
+                    }
+        
+                    if ($customerId !== 'all') {
+                        $query->where('customer_id', $customerId);
+                    }
+
+                    $query->select('id', 'transaction_date', 'transaction_number', 'due_date', 'total_amount', 'payment_status', 'customer_id');
+                    break;
                 default:
                     throw new \Exception("Invalid report type");    
             }
@@ -100,6 +115,8 @@ class ReportController extends Controller
                 return Excel::download(new TransactionExport($data, $startDate, $endDate, $customerName), $fileName);
             case 'payments':
                 return Excel::download(new PaymentExport($data, $startDate, $endDate, $customerName), $fileName);
+            case 'receivables':
+                return Excel::download(new ReceivablesExport($data, $startDate, $endDate, $customerName), $fileName);
             default:
                 throw new \Exception("Invalid report type");  
 
