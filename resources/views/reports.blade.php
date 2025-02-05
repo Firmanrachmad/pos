@@ -191,6 +191,7 @@
 
         if (format === undefined || reportType === undefined || dateRange === undefined || paymentStatus.length === 0) {
             toastr.error('Please fill all the fields');
+            overlay.style.display ='none'
             return;
         }
 

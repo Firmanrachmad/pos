@@ -340,10 +340,9 @@
   }
 
   async function saveCustomer() {
-      const id = document.getElementById('customerId').value
       const name = document.getElementById('customerName').value
 
-      const payload = { id, name }
+      const payload = { name }
       const url = '/api/add-customer'
 
       await fetch(url, {

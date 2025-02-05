@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\PaymentExport;
 use App\Exports\TransactionExport;
 use App\Models\Customer;
 use App\Models\Payment;
@@ -51,7 +52,6 @@ class ReportController extends Controller
                     
                 case 'payments':
                     $query = Payment::with([
-                        'transaction',
                         'transaction.customer'
                     ])->whereBetween('payment_date', [$startDate, $endDate]);
 
@@ -65,7 +65,7 @@ class ReportController extends Controller
                         });
                     }
 
-                    $query->select('id', 'payment_date', 'payment_method', 'payment', 'change', 'note');
+                    $query->select('id', 'payment_date', 'payment_method', 'payment', 'change', 'note', 'status', 'transaction_id');
                     break;
                 default:
                     throw new \Exception("Invalid report type");    
@@ -99,7 +99,7 @@ class ReportController extends Controller
             case 'transactions':
                 return Excel::download(new TransactionExport($data, $startDate, $endDate, $customerName), $fileName);
             case 'payments':
-
+                return Excel::download(new PaymentExport($data, $startDate, $endDate, $customerName), $fileName);
             default:
                 throw new \Exception("Invalid report type");  
 
