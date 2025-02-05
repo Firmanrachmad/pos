@@ -171,13 +171,18 @@
     async function generateReport() {
         const format = $('input[name="format"]:checked').val();
         const reportType = $('#reportType').val();
-        const dateRange = $('#dateRange').val();
+        let dateRange = $('#dateRange').val();
         const paymentStatus = $('input[name="payStatus"]:checked').map(function () {
             return $(this).val();
         }).get();
         const customer = document.getElementById('customerSelect').value
         const overlay = document.getElementById('checkoutLoadingOverlay')
         overlay.style.display = 'flex'
+
+        dateRange = dateRange.split(" - ").map(date => {
+            let [month, day, year] = date.split("/");
+            return `${day}/${month}/${year}`;
+        }).join(" - ");
 
         const data = {
             format,
