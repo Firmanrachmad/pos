@@ -42,10 +42,11 @@ class SalesPerCustomerExport implements FromCollection, WithHeadings, WithStyles
         $totalRemaining = 0;
 
         $dataRows = $this->data->map(function ($customer, $index) use (&$totalAmount, &$totalPayments, &$totalRemaining) {
-            $totalAmount += $customer->transactions->sum('total_amount');
+            $customerTotalAmount = $customer->transactions->sum('total_amount');
             $totalPaid = $customer->transactions->flatMap->payment->sum('payment');
-            $remaining = $totalAmount - $totalPaid;
+            $remaining = $customerTotalAmount - $totalPaid;
 
+            $totalAmount += $customerTotalAmount;
             $totalPayments += $totalPaid;
             $totalRemaining += $remaining;
 
@@ -53,11 +54,12 @@ class SalesPerCustomerExport implements FromCollection, WithHeadings, WithStyles
                 $index + 1,
                 $customer->name,
                 $customer->transactions->count(),
-                sprintf('%.2f', $totalAmount),
+                sprintf('%.2f', $customerTotalAmount),
                 sprintf('%.2f', $totalPaid),
                 sprintf('%.2f', $remaining),
                 $customer->transactions->last() ? \Carbon\Carbon::parse($customer->transactions->last()->transaction_date)->format('d/m/Y H:i') : '-',
             ];
+
         });
 
         $footer = [

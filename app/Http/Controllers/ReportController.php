@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\PaymentExport;
 use App\Exports\ReceivablesExport;
+use App\Exports\RevenueExport;
 use App\Exports\SalesPerCustomerExport;
 use App\Exports\TransactionExport;
 use App\Models\Customer;
@@ -84,24 +85,6 @@ class ReportController extends Controller
                     $query->select('id', 'transaction_date', 'transaction_number', 'due_date', 'total_amount', 'payment_status', 'customer_id');
                     break;
                 case 'sales_per_customer':
-                    // $query = Customer::with(['transactions.payments'])
-                    //     ->whereBetween('transactions.transaction_date', [$startDate, $endDate]);
-
-                    // if(!empty($paymentStatus)){
-                    //     $query->whereIn('transactions.payment_status', $paymentStatus);
-                    // }
-
-                    // if ($customerId !== 'all') {
-                    //     $query->where('customer_id', $customerId);
-                    // }
-
-                    // $query->select('id', 'name', 'transactions.id', 'transactions.')
-
-                    // $query = Transactions::with(['customer', 'payment'])
-                    //     ->whereBetween('transaction_date', [$startDate, $endDate]);
-                    // if (!empty($paymentStatus)) {
-                    //     $query->whereIn('payment_status', $paymentStatus);
-                    // }
 
                     $query = Customer::with(['transactions.payment'])
                         ->whereHas('transactions', function ($q) use ($startDate, $endDate) {
@@ -119,6 +102,20 @@ class ReportController extends Controller
                     }
 
                     $query->select('id', 'name');
+                    break;
+                case 'revenue':
+                    $query = Transactions::with('payment')
+                        ->whereBetween('transaction_date', [$startDate, $endDate]);
+
+                    if (!empty($paymentStatus)) {
+                        $query->whereIn('payment_status', $paymentStatus);
+                    }
+        
+                    if ($customerId !== 'all') {
+                        $query->where('customer_id', $customerId);
+                    }
+
+                    $query->select('id', 'transaction_date', 'transaction_number', 'due_date', 'total_amount', 'payment_status', 'customer_id');
                     break;
                 default:
                     throw new \Exception("Invalid report type");    
@@ -148,18 +145,29 @@ class ReportController extends Controller
     {
         $fileName = 'report.' . $format;
 
-        switch($reportType){
-            case 'transactions':
-                return Excel::download(new TransactionExport($data, $startDate, $endDate, $customerName), $fileName);
-            case 'payments':
-                return Excel::download(new PaymentExport($data, $startDate, $endDate, $customerName), $fileName);
-            case 'receivables':
-                return Excel::download(new ReceivablesExport($data, $startDate, $endDate, $customerName), $fileName);
-            case 'sales_per_customer':
-                return Excel::download(new SalesPerCustomerExport($data, $startDate, $endDate, $customerName), $fileName);
-            default:
-                throw new \Exception("Invalid report type");  
+        try {
 
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+
+        try {
+            switch($reportType){
+                case 'transactions':
+                    return Excel::download(new TransactionExport($data, $startDate, $endDate, $customerName), $fileName);
+                case 'payments':
+                    return Excel::download(new PaymentExport($data, $startDate, $endDate, $customerName), $fileName);
+                case 'receivables':
+                    return Excel::download(new ReceivablesExport($data, $startDate, $endDate, $customerName), $fileName);
+                case 'sales_per_customer':
+                    return Excel::download(new SalesPerCustomerExport($data, $startDate, $endDate, $customerName), $fileName);
+                case 'revenue':
+                    return Excel::download(new RevenueExport($data, $startDate, $endDate, $customerName), $fileName);
+                default:
+                    throw new \Exception("Invalid report type");  
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
 
     }

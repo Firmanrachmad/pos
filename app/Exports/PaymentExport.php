@@ -144,7 +144,7 @@ class PaymentExport implements FromCollection, WithHeadings, WithStyles, WithEve
                     ],
                 ]);
 
-                foreach (range('A', 'G') as $column) {
+                foreach (range('A', 'H') as $column) {
                     $sheet->getColumnDimension($column)->setAutoSize(true);
                 }
             },
