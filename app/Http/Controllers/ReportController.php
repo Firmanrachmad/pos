@@ -10,6 +10,7 @@ use App\Exports\TransactionExport;
 use App\Models\Customer;
 use App\Models\Payment;
 use App\Models\Transactions;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -127,14 +128,14 @@ class ReportController extends Controller
                 return back()->withErrors(['No data available for the selected criteria.']);
             }
 
-            if ($format === 'csv' || $format === 'xlsx') {
-                $customerName = $customerId !== 'all'
-                    ? Customer::where('id', $customerId)->value('name') ?? 'Unknown Customer'
-                    : 'All Customers';
+            $customerName = $customerId !== 'all'
+                ? Customer::where('id', $customerId)->value('name') ?? 'Unknown Customer'
+                : 'All Customers';
 
+            if ($format === 'csv' || $format === 'xlsx') {
                 return $this->generateExcel($data, $format, $reportType, $startDate, $endDate, $customerName);
             } elseif ($format === 'pdf') {
-                return $this->generatePdf($data);
+                return $this->generatePdf($data, $reportType, new Carbon($startDate), new Carbon($endDate), $customerName);
             }
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -170,5 +171,32 @@ class ReportController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
 
+    }
+
+    public function generatePdf($data, $reportType, $startDate, $endDate, $customerName){
+        // Prepare the data for the PDF view
+        try {
+            
+            $pdfData = [
+                'data' => $data,
+                'reportType' => $reportType,
+                'startDate' => $startDate->format('d/m/Y'),
+                'endDate' => $endDate->format('d/m/Y'),
+                'customerName' => $customerName,
+                'totalAmount' => $data->sum('total_amount'),
+            ];
+    
+            // Load the view and generate the PDF
+            $pdf = Pdf::loadView('reports.transactions_pdf', $pdfData);
+    
+            // Set the filename for the PDF
+            $filename = 'transactions_report_' . Carbon::now()->format('Ymd_His') . '.pdf';
+    
+            // Return the PDF as a download
+            return $pdf->download($filename);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }
