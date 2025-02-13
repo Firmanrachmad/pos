@@ -48,8 +48,12 @@ Route::delete('delete-customer/{id}', [CustomerController::class, 'destroy']);
 Route::post('checkout', [TransactionsController::class, 'checkout']);
 Route::get('show-detail/{id}', [TransactionDetailController::class, 'show']);
 Route::get('transaction', [TransactionDetailController::class, 'index']);
+
+// Payment
 Route::post('pay/{id}', [PaymentController::class, 'pay']);
 Route::get('payment', [PaymentController::class, 'index']);
+Route::post('payment-history/{id}', [PaymentController::class, 'generateHistory']);
+
+// Report & Invoice
 Route::post('report', [ReportController::class, 'generateReport']);
 Route::post('invoice', [InvoiceController::class, 'generateInvoice']);
-Route::post('transaction-history/{id}', [InvoiceController::class, 'generateHistory']);

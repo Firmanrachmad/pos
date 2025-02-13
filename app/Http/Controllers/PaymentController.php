@@ -6,6 +6,7 @@ use App\Models\Payment;
 use App\Models\Transactions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PaymentController extends Controller
 {
@@ -84,6 +85,34 @@ class PaymentController extends Controller
             ], 500);
 
         }
+    }
+
+    
+    public function generateHistory($id)
+    {
+        
+        $transaction = Transactions::with([
+            'transactionDetails.product', 
+            'payment' => function($query) {
+                $query->orderBy('payment_date', 'asc');
+            },
+            'customer'
+        ])->find($id);
+
+        if (!$transaction) {
+            return response()->json(['error' => 'Transaction not found'], 404);
+        }
+
+        $data = [
+            'transaction' => $transaction,
+            'customer' => $transaction->customer,
+            'details' => $transaction->transactionDetails,
+            'payments' => $transaction->payment,
+        ];
+
+        $pdf = Pdf::loadView('reports.transaction-history', $data);
+
+        return $pdf->stream('transaction_history.pdf');
     }
 
 }

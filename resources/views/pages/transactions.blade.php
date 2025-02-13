@@ -494,7 +494,7 @@
    async function printTransaction() {
       const overlay = document.getElementById('checkoutLoadingOverlay')
       overlay.style.display = 'flex'
-      const transactionResponse = await fetch('api/transaction-history/' + currentTransactionData.id, {
+      const transactionResponse = await fetch('api/payment-history/' + currentTransactionData.id, {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',

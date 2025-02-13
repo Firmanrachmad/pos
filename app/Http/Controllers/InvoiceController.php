@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Customer;
 use App\Models\Product;
-use App\Models\Transactions;
 
 class InvoiceController extends Controller
 {
@@ -60,32 +59,4 @@ class InvoiceController extends Controller
 
         return $pdf->stream('invoice.pdf');
     }
-
-    public function generateHistory($id)
-    {
-        
-        $transaction = Transactions::with([
-            'transactionDetails.product', 
-            'payment' => function($query) {
-                $query->orderBy('payment_date', 'desc');
-            },
-            'customer'
-        ])->find($id);
-
-        if (!$transaction) {
-            return response()->json(['error' => 'Transaction not found'], 404);
-        }
-
-        $data = [
-            'transaction' => $transaction,
-            'customer' => $transaction->customer,
-            'details' => $transaction->transactionDetails,
-            'payments' => $transaction->payment,
-        ];
-
-        $pdf = Pdf::loadView('reports.transaction-history', $data);
-
-        return $pdf->stream('transaction_history.pdf');
-    }
-
 }
