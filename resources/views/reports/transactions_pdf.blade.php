@@ -56,7 +56,7 @@
                 <tr>
                     <td>{{ \Carbon\Carbon::parse($transaction->transaction_date)->format('d/m/Y') }}</td>
                     <td>{{ $transaction->transaction_number }}</td>
-                    <td>{{ $data->due_date ? Carbon\Carbon::parse($data->due_date)->format('d/m/Y') : '-' }} </td>
+                    <td>{{ $transaction->due_date ? Carbon\Carbon::parse($transaction->due_date)->format('d/m/Y') : '-' }} </td>
                     <td>{{ number_format($transaction->total_amount, 2) }}</td>
                     <td>{{ ucfirst($transaction->payment_status) }}</td>
                 </tr>

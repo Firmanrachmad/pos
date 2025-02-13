@@ -7,30 +7,30 @@ use Illuminate\Http\Request;
 class ViewController extends Controller
 {
     public function customer(){
-        return view('customers');
+        return view('pages.customers');
     }
     
     public function category(){
-        return view('categories');
+        return view('pages.categories');
     }
 
     public function product(){
-        return view('products');
+        return view('pages.products');
     }
 
     public function pos(){
-        return view('pos');
+        return view('pages.pos');
     }
 
     public function transaction(){
-        return view('transactions');
+        return view('pages.transactions');
     }
 
     public function payment(){
-        return view('payments');
+        return view('pages.payments');
     }
 
     public function reporting(){
-        return view('reports');
+        return view('pages.reports');
     }
 }

@@ -56,7 +56,7 @@ class InvoiceController extends Controller
             'note' => $validated['note'] ?? '',
         ];
 
-        $pdf = Pdf::loadView('invoice', $invoiceData);
+        $pdf = Pdf::loadView('invoice.invoice', $invoiceData);
 
         return $pdf->stream('invoice.pdf');
     }
@@ -83,7 +83,7 @@ class InvoiceController extends Controller
             'payments' => $transaction->payment,
         ];
 
-        $pdf = Pdf::loadView('transaction-history', $data);
+        $pdf = Pdf::loadView('reports.transaction-history', $data);
 
         return $pdf->stream('transaction_history.pdf');
     }

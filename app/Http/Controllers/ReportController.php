@@ -147,12 +147,6 @@ class ReportController extends Controller
         $fileName = 'report.' . $format;
 
         try {
-
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
-
-        try {
             switch($reportType){
                 case 'transactions':
                     return Excel::download(new TransactionExport($data, $startDate, $endDate, $customerName), $fileName);
@@ -185,12 +179,18 @@ class ReportController extends Controller
                 'customerName' => $customerName,
                 'totalAmount' => $data->sum('total_amount'),
             ];
-    
-            // Load the view and generate the PDF
-            $pdf = Pdf::loadView('reports.transactions_pdf', $pdfData);
-    
-            // Set the filename for the PDF
-            $filename = 'transactions_report_' . Carbon::now()->format('Ymd_His') . '.pdf';
+
+            switch($reportType){
+                case 'transactions':
+
+                    $pdf = Pdf::loadView('reports.transactions_pdf', $pdfData);
+            
+                    $filename = 'transactions_report_' . Carbon::now()->format('Ymd_His') . '.pdf';
+                    break;
+                    
+                case 'payments':
+
+            }
     
             // Return the PDF as a download
             return $pdf->download($filename);
