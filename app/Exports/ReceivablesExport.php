@@ -161,6 +161,12 @@ class ReceivablesExport implements FromCollection, WithHeadings, WithStyles, Wit
                 foreach (range('A', 'I') as $column) {
                     $sheet->getColumnDimension($column)->setAutoSize(true);
                 }
+
+                $startDataRow = 5;
+                $endDataRow = $highestRow - 1;
+
+                $sheet->getStyle("D{$startDataRow}:D{$endDataRow}")->getAlignment()->setHorizontal('center');
+                $sheet->getStyle("I{$startDataRow}:I{$endDataRow}")->getAlignment()->setHorizontal('center');
             },
         ];
     }

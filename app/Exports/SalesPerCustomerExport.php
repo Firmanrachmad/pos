@@ -155,6 +155,11 @@ class SalesPerCustomerExport implements FromCollection, WithHeadings, WithStyles
                 foreach (range('A', 'G') as $column) {
                     $sheet->getColumnDimension($column)->setAutoSize(true);
                 }
+
+                $startDataRow = 5;
+                $endDataRow = $highestRow - 1;
+
+                $sheet->getStyle("B{$startDataRow}:B{$endDataRow}")->getAlignment()->setHorizontal('center');
             },
         ];
     }

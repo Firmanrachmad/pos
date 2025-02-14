@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Transactions Report</title>
+    <title>Payments Report</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -46,7 +46,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>Transactions Report</h1>
+        <h1>Payments Report</h1>
         <p>Customer: {{ $customerName }}</p>
         <p>Date Range: {{ $startDate }} - {{ $endDate }}</p>
     </div>
@@ -54,31 +54,35 @@
     <table>
         <thead>
             <tr>
-                <th>Transaction Date</th>
+                <th>Customer</th>
                 <th>Transaction Number</th>
-                <th>Customer Name</th>
-                <th>Due Date</th>
-                <th>Total Amount</th>
-                <th>Payment Status</th>
+                <th>Payment Date</th>
+                <th>Payment Method</th>
+                <th>Payment</th>
+                <th>Change</th>
+                <th>Transaction Status</th>
+                <th>Note</th>
             </tr>
         </thead>
         <tbody>
-            @foreach ($data as $transaction)
+            @foreach ($data as $payment)
                 <tr>
-                    <td>{{ \Carbon\Carbon::parse($transaction->transaction_date)->format('d/m/Y') }}</td>
-                    <td>{{ $transaction->transaction_number }}</td>
-                    <td>{{ $transaction->customer ? $transaction->customer->name : '-' }}</td>
-                    <td>{{ $transaction->due_date ? Carbon\Carbon::parse($transaction->due_date)->format('d/m/Y') : '-' }} </td>
-                    <td>{{ number_format($transaction->total_amount, 2) }}</td>
-                    <td>{{ ucfirst($transaction->payment_status) }}</td>
+                    <td>{{ $payment->transaction->customer ? $payment->transaction->customer->name : '-' }}</td>
+                    <td>{{ $payment->transaction->transaction_number }}</td>
+                    <td>{{ $payment->payment_date ? Carbon\Carbon::parse($payment->payment_date)->format('d/m/Y') : '-' }} </td>
+                    <td>{{ $payment->payment_method ? $payment->payment_method : '-' }}</td>
+                    <td>{{ number_format($payment->payment, 2) }}</td>
+                    <td>{{ number_format($payment->change, 2) }}</td>
+                    <td>{{ $payment->status }}</td>
+                    <td>{{ $payment->note ? $payment->note : '-' }}</td>
                 </tr>
             @endforeach
         </tbody>
         <tfoot>
             <tr>
                 <th colspan="4">Total</th>
-                <th>{{ number_format($data->sum('total_amount'), 2) }}</th>
-                <th></th>
+                <th>{{ number_format($data->sum('payment'), 2) }}</th>
+                <th colspan="3"></th>
             </tr>
         </tfoot>
     </table>

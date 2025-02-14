@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Transactions Report</title>
+    <title>Receivables Report</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -46,7 +46,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>Transactions Report</h1>
+        <h1>Receivables Report</h1>
         <p>Customer: {{ $customerName }}</p>
         <p>Date Range: {{ $startDate }} - {{ $endDate }}</p>
     </div>
@@ -56,29 +56,40 @@
             <tr>
                 <th>Transaction Date</th>
                 <th>Transaction Number</th>
-                <th>Customer Name</th>
+                <th>Customer</th>
+                <th>Total Transactions</th>
+                <th>Total Payments</th>
+                <th>Remaining Receivables</th>
                 <th>Due Date</th>
-                <th>Total Amount</th>
-                <th>Payment Status</th>
+                <th>Transaction Status</th>
             </tr>
         </thead>
         <tbody>
-            @foreach ($data as $transaction)
+            @php
+                $totalRemaining = 0;
+            @endphp
+            @foreach ($data as $receivable)
                 <tr>
-                    <td>{{ \Carbon\Carbon::parse($transaction->transaction_date)->format('d/m/Y') }}</td>
-                    <td>{{ $transaction->transaction_number }}</td>
-                    <td>{{ $transaction->customer ? $transaction->customer->name : '-' }}</td>
-                    <td>{{ $transaction->due_date ? Carbon\Carbon::parse($transaction->due_date)->format('d/m/Y') : '-' }} </td>
-                    <td>{{ number_format($transaction->total_amount, 2) }}</td>
-                    <td>{{ ucfirst($transaction->payment_status) }}</td>
+                    @php
+                        $remaining = $receivable->total_amount - $receivable->payment->sum('payment');
+                        $totalRemaining += $remaining;
+                    @endphp
+                    <td>{{ \Carbon\Carbon::parse($receivable->transaction_date)->format('d/m/Y') }}</td>
+                    <td>{{ $receivable->transaction_number }}</td>
+                    <td>{{ $receivable->customer ? $receivable->customer->name : '-' }} </td>
+                    <td>{{ number_format($receivable->total_amount, 2) }}</td>
+                    <td>{{ number_format($receivable->payment->sum('payment'), 2) }}</td>
+                    <td>{{ number_format($remaining, 2) }}</td>
+                    <td>{{ $receivable->due_date ? Carbon\Carbon::parse($receivable->due_date)->format('d/m/Y') : '-' }}</td>
+                    <td>{{ $receivable->payment_status }}</td>
                 </tr>
             @endforeach
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="4">Total</th>
-                <th>{{ number_format($data->sum('total_amount'), 2) }}</th>
-                <th></th>
+                <th colspan="5">Total</th>
+                <th>{{ number_format($totalRemaining, 2) }}</th>
+                <th colspan="2"></th>
             </tr>
         </tfoot>
     </table>

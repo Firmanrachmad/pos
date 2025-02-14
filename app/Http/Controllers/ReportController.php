@@ -168,16 +168,20 @@ class ReportController extends Controller
     }
 
     public function generatePdf($data, $reportType, $startDate, $endDate, $customerName){
-        // Prepare the data for the PDF view
+
+        $groupedData = $data->groupBy(function ($item) {
+            return \Carbon\Carbon::parse($item->transaction_date)->format('F Y');
+        });
+
         try {
             
             $pdfData = [
+                'groupedData' => $groupedData,
                 'data' => $data,
                 'reportType' => $reportType,
                 'startDate' => $startDate->format('d/m/Y'),
                 'endDate' => $endDate->format('d/m/Y'),
                 'customerName' => $customerName,
-                'totalAmount' => $data->sum('total_amount'),
             ];
 
             switch($reportType){
@@ -190,6 +194,30 @@ class ReportController extends Controller
                     
                 case 'payments':
 
+                    $pdf = Pdf::loadView('reports.payments_pdf', $pdfData);
+
+                    $filename = 'payments_report_' . Carbon::now()->format('Ymd_His'). '. pdf';
+                    break;
+                case 'receivables':
+
+                    $pdf = Pdf::loadView('reports.receivables_pdf', $pdfData);
+
+                    $filename = 'receivables_report_' . Carbon::now()->format('Ymd_His'). '. pdf';
+                    break;
+                case 'sales_per_customer':
+
+                    $pdf = Pdf::loadView('reports.sales_per_customers_pdf', $pdfData);
+
+                    $filename = 'sales_per_customers_report_' . Carbon::now()->format('Ymd_His'). '. pdf';
+                    break;
+                case 'revenue':
+
+                    $pdf = Pdf::loadView('reports.revenue_pdf', $pdfData);
+                    
+                    $filename = 'revenue_report_' . Carbon::now()->format('Ymd_His'). '. pdf';
+                    break;
+                default:
+                    throw new \Exception("Invalid report type");
             }
     
             // Return the PDF as a download

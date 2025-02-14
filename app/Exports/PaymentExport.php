@@ -34,26 +34,27 @@ class PaymentExport implements FromCollection, WithHeadings, WithStyles, WithEve
             ['Payment Report'],
             ['Date Range:', $this->startDate . ' - ' . $this->endDate],
             ['Customer:', $this->customerName],
-            ['No', 'Payment Date', 'Payment Method', 'Payment', 'Change', 'Transaction Status', 'Note', 'Customer'],
+            ['No', 'Customer', 'Transaction Number', 'Payment Date', 'Payment Method', 'Payment', 'Change', 'Transaction Status', 'Note'],
         ];
 
         $dataRows = $this->data->map(function ($item, $index) {
             return [
                 $index + 1,
+                isset($item->transaction->customer) ? $item->transaction->customer->name : '-',
+                $item->transaction->transaction_number,
                 $item->payment_date ? \Carbon\Carbon::parse($item->payment_date)->format('d/m/Y H:i') : '-',
                 $item->payment_method ? $item->payment_method : '-',
                 $item->payment,
                 $item->change,
                 $item->status,
                 $item->note ? $item->note : '-',
-                isset($item->transaction->customer) ? $item->transaction->customer->name : '-',
             ];            
         });
 
         $totalAmount = $this->data->sum('payment');
     
         $footer = [
-            ['', '', 'Total', $totalAmount, '', '', ''],
+            ['', '', '', '', 'Total', $totalAmount, '', '', ''],
         ];
     
         return collect($header)
@@ -87,13 +88,13 @@ class PaymentExport implements FromCollection, WithHeadings, WithStyles, WithEve
 
                 $highestRow = $sheet->getHighestRow();
 
-                $sheet->mergeCells('A1:H1');
-                $sheet->mergeCells('B2:H2');
-                $sheet->mergeCells('B3:H3');
+                $sheet->mergeCells('A1:I1');
+                $sheet->mergeCells('B2:I2');
+                $sheet->mergeCells('B3:I3');
 
-                $totalRowRange = "A{$highestRow}:H{$highestRow}";
+                $totalRowRange = "A{$highestRow}:I{$highestRow}";
 
-                $headerRange = 'A4:H4';
+                $headerRange = 'A4:I4';
                 $borderStyle = [
                     'borders' => [
                         'allBorders' => [
@@ -106,8 +107,7 @@ class PaymentExport implements FromCollection, WithHeadings, WithStyles, WithEve
 
                 $sheet->getStyle($headerRange)->getFill()->setFillType('solid')->getStartColor()->setARGB('D9D9D9');
 
-                $highestRow = $sheet->getHighestRow();
-                $outerBorderRange = "A4:H{$highestRow}";
+                $outerBorderRange = "A4:I{$highestRow}";
                 $outerBorderStyle = [
                     'borders' => [
                         'outline' => [
@@ -144,9 +144,16 @@ class PaymentExport implements FromCollection, WithHeadings, WithStyles, WithEve
                     ],
                 ]);
 
-                foreach (range('A', 'H') as $column) {
+                foreach (range('A', 'I') as $column) {
                     $sheet->getColumnDimension($column)->setAutoSize(true);
                 }
+
+                $startDataRow = 5;
+                $endDataRow = $highestRow - 1;
+
+                $sheet->getStyle("B{$startDataRow}:B{$endDataRow}")->getAlignment()->setHorizontal('center');
+                $sheet->getStyle("H{$startDataRow}:H{$endDataRow}")->getAlignment()->setHorizontal('center');
+
             },
         ];
     }

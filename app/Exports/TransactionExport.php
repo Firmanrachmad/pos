@@ -31,7 +31,7 @@ class TransactionExport implements FromCollection, WithHeadings, WithStyles, Wit
             ['Transaction Report'],
             ['Date Range:', $this->startDate . ' - ' . $this->endDate],
             ['Customer:', $this->customerName],
-            ['No', 'Transaction Date', 'Transaction Number', 'Due Date', 'Total Amount', 'Payment Status', 'Customer Name'],
+            ['No', 'Transaction Date', 'Transaction Number', 'Customer', 'Total Amount', 'Payment Status', 'Due Date'],
         ];
     
         $dataRows = $this->data->map(function ($item, $index) {
@@ -39,10 +39,10 @@ class TransactionExport implements FromCollection, WithHeadings, WithStyles, Wit
                 $index + 1, // Generate numbering
                 $item->transaction_date ? \Carbon\Carbon::parse($item->transaction_date)->format('d/m/Y H:i') : '-',
                 $item->transaction_number,
-                $item->due_date ? \Carbon\Carbon::parse($item->due_date)->format('d/m/Y H:i') : '-',
+                $item->customer ? $item->customer->name : '-',
                 $item->total_amount,
                 $item->payment_status,
-                $item->customer ? $item->customer->name : '-',
+                $item->due_date ? \Carbon\Carbon::parse($item->due_date)->format('d/m/Y H:i') : '-',
             ];            
         });
     
@@ -102,7 +102,6 @@ class TransactionExport implements FromCollection, WithHeadings, WithStyles, Wit
 
                 $sheet->getStyle($headerRange)->getFill()->setFillType('solid')->getStartColor()->setARGB('D9D9D9');
 
-                $highestRow = $sheet->getHighestRow();
                 $outerBorderRange = "A4:G{$highestRow}";
                 $outerBorderStyle = [
                     'borders' => [
@@ -143,6 +142,12 @@ class TransactionExport implements FromCollection, WithHeadings, WithStyles, Wit
                 foreach (range('A', 'G') as $column) {
                     $sheet->getColumnDimension($column)->setAutoSize(true);
                 }
+
+                $startDataRow = 5;
+                $endDataRow = $highestRow - 1;
+
+                $sheet->getStyle("D{$startDataRow}:D{$endDataRow}")->getAlignment()->setHorizontal('center');
+                $sheet->getStyle("F{$startDataRow}:F{$endDataRow}")->getAlignment()->setHorizontal('center');
             },
         ];
     }
