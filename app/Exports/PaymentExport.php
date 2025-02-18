@@ -37,7 +37,9 @@ class PaymentExport implements FromCollection, WithHeadings, WithStyles, WithEve
             ['No', 'Customer', 'Transaction Number', 'Payment Date', 'Payment Method', 'Payment', 'Change', 'Transaction Status', 'Note'],
         ];
 
-        $dataRows = $this->data->map(function ($item, $index) {
+        $sortedData = $this->data->sortBy('payment_date')->values();
+
+        $dataRows = $sortedData->map(function ($item, $index) {
             return [
                 $index + 1,
                 isset($item->transaction->customer) ? $item->transaction->customer->name : '-',

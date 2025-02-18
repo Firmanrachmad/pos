@@ -33,8 +33,10 @@ class TransactionExport implements FromCollection, WithHeadings, WithStyles, Wit
             ['Customer:', $this->customerName],
             ['No', 'Transaction Date', 'Transaction Number', 'Customer', 'Total Amount', 'Payment Status', 'Due Date'],
         ];
+
+        $sortedData = $this->data->sortBy('transaction_date')->values();
     
-        $dataRows = $this->data->map(function ($item, $index) {
+        $dataRows = $sortedData->map(function ($item, $index) {
             return [
                 $index + 1, // Generate numbering
                 $item->transaction_date ? \Carbon\Carbon::parse($item->transaction_date)->format('d/m/Y H:i') : '-',

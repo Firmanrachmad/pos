@@ -38,9 +38,11 @@ class ReceivablesExport implements FromCollection, WithHeadings, WithStyles, Wit
             ['No', 'Transaction Date', 'Transaction Number', 'Customer Name', 'Total Transactions', 'Total Payments', 'Remaining Receivables', 'Due Date', 'Transaction Status'],
         ];
 
+        $sortedData = $this->data->sortBy('transaction_date')->values();
+
         $totalRemaining = 0;
 
-        $dataRows = $this->data->map(function ($item, $index) use (&$totalRemaining) {
+        $dataRows = $sortedData->map(function ($item, $index) use (&$totalRemaining) {
             $totalPaid = $item->payment->sum('payment');
             $remaining = $item->total_amount - $totalPaid;
 

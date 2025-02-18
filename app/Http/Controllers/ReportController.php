@@ -167,14 +167,30 @@ class ReportController extends Controller
 
     }
 
-    public function generatePdf($data, $reportType, $startDate, $endDate, $customerName){
-
-        $groupedData = $data->groupBy(function ($item) {
-            return \Carbon\Carbon::parse($item->transaction_date)->format('F Y');
-        });
-
+    public function generatePdf($data, $reportType, $startDate, $endDate, $customerName)
+    {
+        $sortFields = [
+            'transactions' => 'transaction_date',
+            'payments' => 'payment_date',
+            'receivables' => 'transaction_date',
+        ];
+    
+        // Sort the data only if the report type requires it
+        if (isset($sortFields[$reportType])) {
+            $data = $data->sortBy($sortFields[$reportType]);
+        } elseif (!in_array($reportType, ['sales_per_customer', 'revenue'])) {
+            throw new \Exception("Invalid report type");
+        }
+    
+        // Group data
+        $groupedData = $data->groupBy(fn($item) => \Carbon\Carbon::parse($item->transaction_date)->format('F Y'));
+    
+        // Special case: Sort revenue report by month-year
+        if ($reportType === 'revenue') {
+            $groupedData = $groupedData->sortBy(fn($items, $key) => \Carbon\Carbon::parse($key)->format('Y-m'));
+        }
+    
         try {
-            
             $pdfData = [
                 'groupedData' => $groupedData,
                 'data' => $data,
@@ -183,48 +199,24 @@ class ReportController extends Controller
                 'endDate' => $endDate->format('d/m/Y'),
                 'customerName' => $customerName,
             ];
-
-            switch($reportType){
-                case 'transactions':
-
-                    $pdf = Pdf::loadView('reports.transactions_pdf', $pdfData);
-            
-                    $filename = 'transactions_report_' . Carbon::now()->format('Ymd_His') . '.pdf';
-                    break;
-                    
-                case 'payments':
-
-                    $pdf = Pdf::loadView('reports.payments_pdf', $pdfData);
-
-                    $filename = 'payments_report_' . Carbon::now()->format('Ymd_His'). '. pdf';
-                    break;
-                case 'receivables':
-
-                    $pdf = Pdf::loadView('reports.receivables_pdf', $pdfData);
-
-                    $filename = 'receivables_report_' . Carbon::now()->format('Ymd_His'). '. pdf';
-                    break;
-                case 'sales_per_customer':
-
-                    $pdf = Pdf::loadView('reports.sales_per_customers_pdf', $pdfData);
-
-                    $filename = 'sales_per_customers_report_' . Carbon::now()->format('Ymd_His'). '. pdf';
-                    break;
-                case 'revenue':
-
-                    $pdf = Pdf::loadView('reports.revenue_pdf', $pdfData);
-                    
-                    $filename = 'revenue_report_' . Carbon::now()->format('Ymd_His'). '. pdf';
-                    break;
-                default:
-                    throw new \Exception("Invalid report type");
-            }
     
-            // Return the PDF as a download
+            // Mapping report types to view filenames
+            $viewFiles = [
+                'transactions' => 'reports.transactions_pdf',
+                'payments' => 'reports.payments_pdf',
+                'receivables' => 'reports.receivables_pdf',
+                'sales_per_customer' => 'reports.sales_per_customers_pdf',
+                'revenue' => 'reports.revenue_pdf',
+            ];
+    
+            // Generate PDF
+            $pdf = Pdf::loadView($viewFiles[$reportType], $pdfData);
+            $filename = "{$reportType}_report_" . Carbon::now()->format('Ymd_His') . '.pdf';
+    
             return $pdf->download($filename);
-
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+    
 }
